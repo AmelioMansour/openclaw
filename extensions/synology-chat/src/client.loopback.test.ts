@@ -353,6 +353,35 @@ describe("Synology Chat client loopback", () => {
     }
   });
 
+  it("returns every platform post ID when an attachment caption overflows", async () => {
+    const payloads: Array<Record<string, unknown>> = [];
+    const port = await listenLoopback((req, res) => {
+      readPayload(req, (payload) => {
+        payloads.push(payload);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            success: true,
+            data: { succ: { user_id_post_map: { "42": 700 + payloads.length } } },
+          }),
+        );
+      });
+    });
+    const result = await synologyChatPlugin.message.send?.media?.({
+      cfg: config(`http://127.0.0.1:${port}/incoming`),
+      to: "42",
+      text: "x".repeat(4_001),
+      mediaUrl: "https://example.com/caption.png",
+    });
+    expect(payloads).toEqual([
+      { file_url: hostedCapabilityUrl, text: "x".repeat(2_000), user_ids: [42] },
+      { text: "x".repeat(2_000), user_ids: [42] },
+      { text: "x", user_ids: [42] },
+    ]);
+    expect(result?.receipt.platformMessageIds).toEqual(["701", "702", "703"]);
+    expect(result?.messageId).toBe("701");
+  });
+
   it.each([true, false])(
     "bounds attachment captions and preserves media custody when overflow acceptance is %s",
     async (acceptOverflow) => {

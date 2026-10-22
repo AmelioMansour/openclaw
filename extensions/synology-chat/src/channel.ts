@@ -290,7 +290,7 @@ async function sendSynologyChatMedia(ctx: SynologyMediaContext & { mediaUrl: str
   } catch (error) {
     throw accepted.partialError(error);
   }
-  return result;
+  return { ...result, ...accepted.result() };
 }
 
 const synologyChatMessageAdapter = defineChannelMessageAdapter({
