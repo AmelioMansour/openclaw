@@ -152,7 +152,7 @@ export async function sendMessageNextcloudTalk(
       throw new Error(errorMsg);
     }
 
-    let messageId = "unknown";
+    let messageId = "";
     let timestamp: number | undefined;
     try {
       const data = await readProviderJsonResponse<{
@@ -171,7 +171,7 @@ export async function sendMessageNextcloudTalk(
       }
     } catch {
       // Response parsing failed (including an over-limit body), but the message
-      // was already accepted by the server, so keep the "unknown" receipt.
+      // was already accepted by the server, so keep its receipt unidentified.
     }
 
     getOptionalNextcloudTalkRuntime()?.channel.activity.record({

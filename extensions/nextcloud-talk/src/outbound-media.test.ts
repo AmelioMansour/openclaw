@@ -1,7 +1,10 @@
 import { writeFile } from "node:fs/promises";
 import type { ServerResponse } from "node:http";
 import path from "node:path";
-import type { ChannelMessageSendMediaContext } from "openclaw/plugin-sdk/channel-outbound";
+import {
+  createMessageReceiptFromOutboundResults,
+  type ChannelMessageSendMediaContext,
+} from "openclaw/plugin-sdk/channel-outbound";
 import { expectDefined } from "openclaw/plugin-sdk/expect-runtime";
 import { createDeferred } from "openclaw/plugin-sdk/extension-shared";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -760,6 +763,22 @@ it("rejects a redirect after delivery cancellation", async () => {
   ]);
 });
 
+it.each(["text", "media"] as const)(
+  "keeps an unidentified %s send unidentified through receipt normalization",
+  async (kind) => {
+    await withTalkServer(
+      async (ctx) => {
+        const result = await (kind === "text" ? sendText : sendMedia)({ ...ctx, text: "hello" });
+        const receipt = createMessageReceiptFromOutboundResults({ results: [result] });
+        expect(result.messageId).toBe("");
+        expect(receipt.platformMessageIds).toEqual([]);
+        expect(receipt.sourceResults?.map((source) => source.messageId)).toEqual([""]);
+      },
+      (response) => acceptMessage(response, false),
+    );
+  },
+);
+
 it.each([false, true])(
   "preserves an accepted send after cancellation with valid body=%s",
   async (validBody) => {
@@ -767,7 +786,7 @@ it.each([false, true])(
     await withTalkServer(
       (ctx) =>
         expect(sendMedia({ ...ctx, ...handoff.callbacks })).resolves.toMatchObject({
-          messageId: validBody ? "42" : "unknown",
+          messageId: validBody ? "42" : "",
           receipt: { platformMessageIds: validBody ? ["42"] : [] },
         }),
       (response) => {
