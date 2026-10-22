@@ -48,6 +48,7 @@ export type AgentsProps = Omit<
   >;
   overview: Omit<AgentsPageView["overview"], "modelSelectionPolicy" | "modelCatalogRetired"> &
     Partial<Pick<AgentsPageView["overview"], "modelSelectionPolicy" | "modelCatalogRetired">>;
+  identitySavePending?: boolean;
   onOpenMemoryImport?: AgentsPageView["onOpenMemoryImport"];
   onOpenMemorySettings?: AgentsPageView["onOpenMemorySettings"];
 };
@@ -91,8 +92,11 @@ export function Agents(props: AgentsProps) {
       : (props.readData().agentsList?.defaultId ?? null);
   const selectedAgent = createMemo(
     () =>
-      props.readData().agentsList?.agents.find((agent) => agent.id === props.selectedAgentId) ??
-      null,
+      props
+        .readData()
+        .agentsList?.agents.find(
+          (agent) => agent.kind !== "system" && agent.id === props.selectedAgentId,
+        ) ?? null,
   );
   const configActions = () => ({
     configForm: config(),
@@ -100,6 +104,7 @@ export function Agents(props: AgentsProps) {
     configSaving: props.config.configSaving,
     configDirty: props.config.configFormDirty,
     canUpdateConfig: props.access.canUpdateConfig,
+    presentationRetired: props.presentationRetired(),
     onConfigReload: props.onConfigReload,
     onConfigSave: props.onConfigSave,
   });
@@ -260,6 +265,7 @@ export function Agents(props: AgentsProps) {
                       {(agentId) => (
                         <AgentOverview
                           {...props.overview}
+                          identitySavePending={props.identitySavePending ?? false}
                           readData={props.readData}
                           {...configActions()}
                           agent={agent()}

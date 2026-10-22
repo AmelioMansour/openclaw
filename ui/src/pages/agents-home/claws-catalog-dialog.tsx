@@ -6,11 +6,12 @@ import { action, createMemo, createOptimistic, createSignal, onSettled, Show } f
 import { selectApplicationSession } from "../../app/agent-selection.ts";
 import type { ApplicationContext } from "../../app/context.ts";
 import { loadSettings } from "../../app/settings.ts";
-import "../../components/file-preview-modal-registration.ts";
+import { FilePreviewModal } from "../../components/file-preview-modal.tsx";
 import { registerClawsEnglish } from "../../i18n/locales/en-claws.ts";
 import { normalizeAgentLabel } from "../../lib/agents/display.ts";
 import { formatUiError, UserFacingError } from "../../lib/format-error.ts";
 import { canCallGatewayMethod } from "../../lib/gateway-methods.ts";
+import { createPageRequestDelay } from "../../lib/page-request.ts";
 import { loadPluginCatalog } from "../../lib/plugins/index.ts";
 import { useApplication } from "../../lib/reactive/context.ts";
 import { useGatewayPage } from "../../lib/reactive/gateway-page.ts";
@@ -53,8 +54,7 @@ class ClawsCatalogModel {
     kind: "instruction" | "skill";
     name: string;
     content: string | null;
-    loading: boolean;
-    error: string | null;
+    request: Promise<void>;
   } | null = null;
   installedPluginPackages: ReadonlySet<string> = new Set();
   addError: string | null = null;
@@ -75,6 +75,7 @@ class ClawsCatalogModel {
   private previewRevision = 0;
   private detailRevision = 0;
   private cancelDetailRead = () => {};
+  private cancelPreviewRead = () => {};
   onIdentityChange() {
     this.resetSelection();
     this.applying = false;
@@ -93,6 +94,7 @@ class ClawsCatalogModel {
 
   dispose() {
     this.cancelDetailRead();
+    this.cancelPreviewRead();
     this.disposed = true;
   }
 
@@ -361,33 +363,35 @@ class ClawsCatalogModel {
   }
 
   closePreview() {
+    this.cancelPreviewRead();
     this.previewRevision += 1;
     this.preview = null;
   }
 
   async openPreview(kind: "instruction" | "skill", name: string) {
+    this.cancelPreviewRead();
     const source = this.source();
     const scope = this.gateway.capture();
     const revision = ++this.previewRevision;
-    this.preview = {
-      kind,
-      name,
-      content: null,
-      loading: Boolean(source && scope),
-      error: source && scope ? null : t("clawsCatalog.unavailable"),
-    };
+    const receipt = Promise.withResolvers<void>();
+    this.cancelPreviewRead = receipt.resolve;
+    void receipt.promise.catch(() => {});
+    this.preview = { kind, name, content: null, request: receipt.promise };
     if (!source || !scope) {
+      receipt.reject(new UserFacingError(t("clawsCatalog.unavailable")));
       return;
     }
     try {
       const result = await readClawPreview(scope.client, source, { kind, name });
       if (this.gateway.isCurrent(scope) && revision === this.previewRevision && this.preview) {
-        this.preview = { ...this.preview, content: result.content, loading: false };
+        this.preview = { ...this.preview, content: result.content };
       }
     } catch (error) {
       if (this.gateway.isCurrent(scope) && revision === this.previewRevision && this.preview) {
-        this.preview = { ...this.preview, loading: false, error: formatUiError(error) };
+        receipt.reject(new UserFacingError(formatUiError(error), { cause: error }));
       }
+    } finally {
+      receipt.resolve();
     }
   }
 
@@ -494,21 +498,9 @@ export function ClawsCatalogDialog(props: ClawsDialogProps) {
       return;
     }
     const packageName = props.initialPackageName;
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let resume: (() => void) | undefined;
-    const ready = delay
-      ? new Promise<void>((resolve) => {
-          resume = resolve;
-          timer = setTimeout(resolve, delay);
-        })
-      : undefined;
-    cancelSearch = () => {
-      cancelled = true;
-      clearTimeout(timer);
-      resume?.();
-    };
-    const isCurrent = () => !cancelled && model.gateway.isCurrent(scope);
+    const { ready, isCancelled, cancel } = createPageRequestDelay(delay);
+    cancelSearch = cancel;
+    const isCurrent = () => !isCancelled() && model.gateway.isCurrent(scope);
     // Admission also refreshes hidden detail pages on reconnect. Keep selection
     // at request completion, outside the async rendering computation.
     void setCatalogRequest(
@@ -565,6 +557,8 @@ export function ClawsCatalogDialog(props: ClawsDialogProps) {
     revision();
     return model.preview;
   });
+  const readInventory = createMemo(() => (preview()?.kind === "skill" ? preview()?.request : null));
+  const readFile = createMemo(() => preview()?.request ?? null);
   const previewPath = () => (preview()?.kind === "skill" ? "SKILL.md" : (preview()?.name ?? ""));
   const files = () => {
     const current = preview();
@@ -603,16 +597,17 @@ export function ClawsCatalogDialog(props: ClawsDialogProps) {
       />
       <Show when={preview()}>
         {(current) => (
-          <openclaw-file-preview-modal
-            prop:label={
+          <FilePreviewModal
+            label={
               current().kind === "instruction" ? t("clawsCatalog.workspaceFiles") : current().name
             }
-            prop:files={files()}
-            prop:activePath={previewPath()}
+            files={files()}
+            activePath={previewPath()}
             layout="document"
-            prop:loading={current().kind === "skill" && current().loading}
-            prop:fileLoading={current().kind === "instruction" && current().loading}
-            prop:error={current().error ?? ""}
+            readInventory={readInventory}
+            inventoryRequest={() => (current().kind === "skill" ? current().request : undefined)}
+            readFile={readFile}
+            fileRequest={() => current().request}
             onFile-preview-select={(event: CustomEvent<string>) => {
               if (current().kind === "instruction" && event.detail !== current().name) {
                 void model.openPreview("instruction", event.detail);
