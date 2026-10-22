@@ -255,6 +255,7 @@ export const en: TranslationMap & {
       | "deleteSessionStale"
       | "deleteSessionsStale"
       | "groupMenu"
+      | "groupOptions"
       | "newSessionInGroup"
       | "groupDefaultsStale"
       | "moveToTopLevel",
@@ -865,6 +866,7 @@ export const en: TranslationMap & {
     deleteSessionsStale:
       "Gateway connection replaced before {count} sessions were deleted. Try again.",
     groupMenu: "Group options for {group}",
+    groupOptions: "Group options",
     newSessionInGroup: "New session in {group}",
     groupDefaultsStale: "Gateway connection replaced before the defaults were saved. Try again.",
     moveToTopLevel: "Move to top level",
@@ -1628,6 +1630,7 @@ export const en: TranslationMap & {
     linksLabel: "Community and resources",
     linkWebsite: "Website",
     linkDocs: "Docs",
+    linkSupport: "Support",
     linkGitHub: "GitHub",
     linkDiscord: "Discord",
     linkX: "X (Twitter)",
@@ -1654,6 +1657,7 @@ export const en: TranslationMap & {
   presence: {
     sharedOwner: {
       name: "Shared owner",
+      named: "{name} · Shared owner",
       hint: "Connected with the Gateway token or over a tunnel, not a personal sign-in.",
     },
     rosterTitle: "Online",
@@ -1922,6 +1926,7 @@ export const en: TranslationMap & {
       emptyValue: "—",
       unknown: "unknown",
       atLeast: "≥ {value}",
+      approx: "≈ {value}",
     },
     loading: {
       title: "Usage Overview",
@@ -1960,6 +1965,9 @@ export const en: TranslationMap & {
       costCategories: "Cost categories",
       remaining: "{percent}% left",
       resets: "Resets {date}",
+      exhausted: "{label} is used up.",
+      checkFailed: "Check failed",
+      exhaustedUntil: "{label} is used up until {date}.",
     },
     presets: {},
     scope: {},
@@ -2106,6 +2114,7 @@ export const en: TranslationMap & {
     startupStatus: {
       preparingWorkspace: "Preparing workspace…",
       namingWorktree: "Naming worktree…",
+      updatingRepository: "Updating repository…",
       creatingWorktree: "Creating worktree…",
       runningSetup: "Running setup…",
       provisioningEnvironment: "Provisioning environment…",
@@ -2224,6 +2233,8 @@ export const en: TranslationMap & {
     usageRemaining: "Usage Remaining",
     view: {},
     sendShortcut: "Send shortcut",
+    sendShortcutHint:
+      "Desktop only. On mobile, Enter adds a new line; use the Send button to send.",
     sendShortcutEnter: "Enter",
     sendShortcutModifierEnter: "⌘/Ctrl+Enter",
     followUpMode: "Follow-ups while the agent is working",
@@ -2673,9 +2684,10 @@ export const en: TranslationMap & {
       tooLargeToast: "File too large. Try a smaller file.",
       openOriginal: "Open original",
       compressToFit: "Compress to fit",
+      retryCompression: "Retry compression",
       compressionHint:
         "Video is too large. Compress a copy on this device; the original stays unchanged.",
-      compressing: "Compressing… {progress}%",
+      compressing: "Compressing · {progress}%",
       compressionUnsupported: "This browser cannot compress this video.",
       compressionTooLarge: "Video is still too large. Try a smaller file.",
       compressionFailed: "Could not compress video. Try again.",
