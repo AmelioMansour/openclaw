@@ -10,6 +10,7 @@ afterEach(() => {
 it.each([
   { mimeType: "image/jpeg", extension: "jpg" },
   { mimeType: "image/jpeg; charset=binary", extension: "jpg" },
+  { mimeType: "IMAGE/JPEG ; CHARSET=UTF-8", extension: "jpg" },
   { mimeType: "image/png; charset=binary", extension: "png" },
 ])(
   "downloads $mimeType with its image extension and retains the payload for 30 seconds",
