@@ -57,12 +57,12 @@ it("clears replayed entries while an older status refresh is still pending", asy
   );
   panel.query<HTMLButtonElement>("#dreams-tab-advanced")!.click();
   await waitForSolid(() => expect(panel.container.textContent).toContain(entry.snippet));
-  getByRole<HTMLButtonElement>(panel.container, "button", { name: "Refresh", exact: true }).click();
+  getByRole<HTMLButtonElement>(panel.container, "button", { name: /^Refresh$/u }).click();
   await waitForSolid(() => expect(reads).toBe(2));
   const clear = getByRole<HTMLButtonElement>(
     panel.container.querySelector(".dreams-advanced__sections")!,
     "button",
-    { name: "Clear Replayed", exact: true },
+    { name: /^Clear Replayed$/u },
   );
   expect(clear.disabled).toBe(false);
   clear.click();
