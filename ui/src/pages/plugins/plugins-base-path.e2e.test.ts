@@ -56,11 +56,22 @@ suite.define(() => {
           methodResponses: pluginMethodResponses(),
         });
         await page.addInitScript(() => {
-          delete (window as MockGatewayWindow)["__OPENCLAW_CONTROL_UI_BASE_PATH__"];
+          // Init-script order is unspecified: ignore the mock fixture's mount assignment
+          // regardless of whether it runs before or after this accessor is installed.
+          Object.defineProperty(window, "__OPENCLAW_CONTROL_UI_BASE_PATH__", {
+            configurable: true,
+            get: () => "",
+            set: () => {},
+          });
         });
         const pathname = "/ui/plugins/ch_bWF0cml4";
         await page.goto(suite.server.baseUrl.slice(0, -1) + pathname + "?probe=1#catalog");
         await page.waitForFunction(() => window.openclawControlUi?.snapshot().routeReady === true);
+        expect(
+          await page.evaluate(
+            () => (window as MockGatewayWindow)["__OPENCLAW_CONTROL_UI_BASE_PATH__"],
+          ),
+        ).toBe("");
         await page.screenshot({
           path: suite.artifactDir + "/catalog-startup.png",
           animations: "disabled",
