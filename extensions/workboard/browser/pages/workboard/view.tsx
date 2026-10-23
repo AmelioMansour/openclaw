@@ -130,7 +130,11 @@ export function WorkboardView(props: WorkboardProps & { onRefresh: () => void })
   const view = createMemo(() => {
     const current = state();
     const agentOptions = buildAgentFilterOptions(props.agentsList, current.cards);
-    const boardOptions = buildBoardFilterOptions(current.boards, current.cards);
+    const boardOptions = buildBoardFilterOptions(
+      current.boards,
+      current.cards,
+      !current.nextCursor,
+    );
     // A deleted board keeps its route filter instead of exposing every board.
     const activeBoardFilter = current.boardFilter;
     const scopedCards = current.cards
