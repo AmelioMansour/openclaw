@@ -122,7 +122,7 @@ function closeContext(context: RenderContext, parent: RenderContext, state: Rend
     case "anchor":
       parent.parts.push(
         context.href && label
-          ? `[${label}](${escapePreMarkerText(context.href)})`
+          ? `[${label}](${escapePreMarkerText(context.href).replace(/[\\()]/g, "\\$&")})`
           : label || escapePreMarkerText(context.href || ""),
       );
       return;
