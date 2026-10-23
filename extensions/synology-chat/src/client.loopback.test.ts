@@ -353,6 +353,29 @@ describe("Synology Chat client loopback", () => {
     }
   });
 
+  it("renders attachment caption links like text messages without rewriting code", async () => {
+    const payloads: Array<Record<string, unknown>> = [];
+    const port = await listenLoopback((req, res) => {
+      readPayload(req, (payload) => {
+        payloads.push(payload);
+        respond(res, true);
+      });
+    });
+    await synologyChatPlugin.message.send?.media?.({
+      cfg: config(`http://127.0.0.1:${port}/incoming`),
+      to: "42",
+      text: "[Read docs](https://example.com/docs) and `[literal](https://example.com/code)`",
+      mediaUrl: "https://example.com/caption.png",
+    });
+    expect(payloads).toEqual([
+      {
+        file_url: hostedCapabilityUrl,
+        text: "<https://example.com/docs|Read docs> and `[literal](https://example.com/code)`",
+        user_ids: [42],
+      },
+    ]);
+  });
+
   it.each([true, false])(
     "bounds attachment captions and preserves media custody when overflow acceptance is %s",
     async (acceptOverflow) => {

@@ -206,21 +206,24 @@ function createSynologyChatSendResult(params: {
   };
 }
 
-async function sendSynologyChatText(ctx: Omit<ChannelMessageSendTextContext, "onDeliveryResult">) {
-  const account = resolveAccount(ctx.cfg ?? {}, ctx.accountId);
-  const incomingUrl = requireIncomingUrl(account);
-  const codeRegions = findCodeRegions(ctx.text);
-  const text = ctx.text.replace(SYNOLOGY_MARKDOWN_LINK_RE, (match, label, url, offset) => {
-    const slashCount = ctx.text.slice(0, offset).match(/\\+$/)?.[0].length ?? 0;
+function formatSynologyChatText(text: string): string {
+  const codeRegions = findCodeRegions(text);
+  return text.replace(SYNOLOGY_MARKDOWN_LINK_RE, (match, label, url, offset) => {
+    const slashCount = text.slice(0, offset).match(/\\+$/)?.[0].length ?? 0;
     if (slashCount % 2 === 1 || isInsideCode(offset, codeRegions) || /[<>|]/.test(label + url)) {
       return match;
     }
     return `<${url.replace(/\\([()])/g, "$1")}|${label.replace(/\\([[\]])/g, "$1")}>`;
   });
+}
+
+async function sendSynologyChatText(ctx: Omit<ChannelMessageSendTextContext, "onDeliveryResult">) {
+  const account = resolveAccount(ctx.cfg ?? {}, ctx.accountId);
+  const incomingUrl = requireIncomingUrl(account);
   const dispatch = ctx.onPlatformSendDispatch;
   const result = await sendMessage(
     incomingUrl,
-    text,
+    formatSynologyChatText(ctx.text),
     ctx.to,
     account.allowInsecureSsl,
     ...(dispatch ? [dispatch] : []),
@@ -246,7 +249,7 @@ async function sendSynologyChatMedia(ctx: SynologyMediaContext & { mediaUrl: str
     mediaReadFile: ctx.mediaReadFile,
   });
   const [caption, ...overflow] = chunkTextForOutbound(
-    ctx.text ?? "",
+    formatSynologyChatText(ctx.text ?? ""),
     SYNOLOGY_CHAT_TEXT_CHUNK_LIMIT,
   );
   const dispatch = ctx.onPlatformSendDispatch;
