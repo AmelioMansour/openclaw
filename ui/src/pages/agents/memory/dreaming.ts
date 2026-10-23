@@ -416,12 +416,13 @@ async function loadDreamingResourceSpec<Key extends DreamingResourceKey>(
     state.dreamingStatusError = null;
   }
   // The Memory owner replaces this state when its agent or connection epoch changes.
-  const promise = (async () => {
-    const payload = await client.request<DreamingResourcePayloads[Key]>(spec.method, { agentId });
-    if (state.resourceReads[key]?.promise === promise) {
-      spec.apply(state, payload);
-    }
-  })();
+  const promise = client
+    .request<DreamingResourcePayloads[Key]>(spec.method, { agentId })
+    .then((payload) => {
+      if (state.resourceReads[key]?.promise === promise) {
+        spec.apply(state, payload);
+      }
+    });
   const issued = { promise, pending: true };
   state.resourceReads[key] = issued;
   try {
