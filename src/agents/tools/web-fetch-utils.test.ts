@@ -19,6 +19,10 @@ describe("web-fetch-utils", () => {
     await expect(
       extractText('<p>Read <a href="https://example.com/search?q=foo)">Cassini</a>.</p>'),
     ).resolves.toBe("Read Cassini.");
+    await expect(
+      extractText('<p>Read <a href="https://example.com/annual report">report</a>.</p>'),
+    ).resolves.toBe("Read report.");
+    await expect(extractText('<p>Open <a href="/docs">C:\\</a>.</p>')).resolves.toBe("Open C:\\.");
     expect(markdownToText("[broken](https://example.com/a_(b)")).toBe(
       "[broken](https://example.com/a_(b)",
     );

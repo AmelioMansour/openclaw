@@ -42,6 +42,7 @@ type RenderContext =
   | { kind: "pre"; parts: string[] };
 
 type RenderState = {
+  linksAsText?: boolean;
   title?: string;
   preBlocks: string[];
 };
@@ -121,8 +122,8 @@ function closeContext(context: RenderContext, parent: RenderContext, state: Rend
       return;
     case "anchor":
       parent.parts.push(
-        context.href && label
-          ? `[${label}](${escapePreMarkerText(context.href).replace(/[\\()]/g, "\\$&")})`
+        !state.linksAsText && context.href && label
+          ? `[${label}](${escapePreMarkerText(context.href)})`
           : label || escapePreMarkerText(context.href || ""),
       );
       return;
@@ -179,10 +180,13 @@ function pushContext(
   stack.push(context);
 }
 
-export function htmlToMarkdown(html: string): { text: string; title?: string } {
+export function htmlToMarkdown(
+  html: string,
+  options?: { linksAsText?: boolean },
+): { text: string; title?: string } {
   const root: RenderContext = { kind: "root", parts: [] };
   const stack: RenderContext[] = [root];
-  const state: RenderState = { preBlocks: [] };
+  const state: RenderState = { preBlocks: [], linksAsText: options?.linksAsText };
   const tableRowCellCounts: number[] = [];
 
   for (let i = 0; i < html.length;) {
@@ -402,7 +406,9 @@ export async function extractBasicHtmlContent(params: {
   extractMode: ExtractMode;
 }): Promise<{ text: string; title?: string } | null> {
   const cleanHtml = await sanitizeHtml(params.html);
-  const rendered = htmlToMarkdown(cleanHtml);
+  // HTML labels are literal text, not authored Markdown. Do not serialize destinations
+  // only to parse them back out in text mode. Keep Markdown rendering unchanged.
+  const rendered = htmlToMarkdown(cleanHtml, { linksAsText: params.extractMode === "text" });
   const text =
     stripInvisibleUnicode(
       params.extractMode === "text" ? markdownToText(rendered.text) : rendered.text,
