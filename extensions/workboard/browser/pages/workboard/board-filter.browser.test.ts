@@ -7,7 +7,7 @@ import {
   createSessions,
 } from "../../../../../ui/src/test-helpers/app-sidebar.ts";
 import { createTestGatewayClient } from "../../../../../ui/src/test-helpers/gateway-client.ts";
-import { loadWorkboard } from "../../lib/workboard/index.ts";
+import { loadWorkboard } from "../../lib/workboard/loading.ts";
 import {
   createWorkboardCard,
   createWorkboardTestClient,
