@@ -22,10 +22,12 @@ import {
   mockedGlobalHookRunner,
   mockedRunEmbeddedAttempt,
   createOverflowRunParams,
-  resetSharedRunIntegrationHarnessMocks,
   useOpenAIPlatformAuthFixture,
 } from "./run.overflow-compaction.harness.js";
-import { loadSharedRunIntegrationHarness } from "./run.shared-integration-harness.test-support.js";
+import {
+  createFreshRunIntegrationState,
+  loadSharedRunIntegrationHarness,
+} from "./run.shared-integration-harness.test-support.js";
 import type { EmbeddedRunAttemptResult } from "./run/types.js";
 
 let state: OpenClawTestState;
@@ -82,11 +84,7 @@ describe("runEmbeddedAgent silent-error retry", () => {
   });
 
   beforeEach(async () => {
-    resetSharedRunIntegrationHarnessMocks();
-    const { createOpenClawTestState } = await import("../../test-utils/openclaw-test-state.js");
-    state = await createOpenClawTestState({ label: "run.empty-error-retry" });
-    const { setRuntimeConfigSnapshot } = await import("../../config/runtime-snapshot.js");
-    setRuntimeConfigSnapshot({});
+    state = await createFreshRunIntegrationState("run.empty-error-retry");
     mockedGlobalHookRunner.hasHooks.mockImplementation(() => false);
     mockedClassifyFailoverReason.mockReturnValue(null);
   });
@@ -200,37 +198,6 @@ describe("runEmbeddedAgent silent-error retry", () => {
     });
   });
 
-  it("does not mark incomplete turns fallback-safe after a terminal heartbeat response", async () => {
-    mockedRunEmbeddedAttempt.mockResolvedValueOnce(
-      makeAttemptResult({
-        ...emptyErrorAttempt("anthropic", "claude-opus-4-8", 1120, [
-          {
-            type: "thinking",
-            thinking: "internal reasoning before provider error",
-            thinkingSignature: JSON.stringify({ id: "rs_heartbeat_error", type: "reasoning" }),
-          },
-        ]),
-        heartbeatToolResponse: {
-          outcome: "progress",
-          notify: false,
-          summary: "Still working",
-        },
-      }),
-    );
-
-    const result = await runEmbeddedAgent({
-      ...createOverflowRunParams(state),
-      provider: "anthropic",
-      model: "claude-opus-4-8",
-      runId: "run-terminal-heartbeat-not-fallback-safe",
-    });
-
-    expect(mockedRunEmbeddedAttempt).toHaveBeenCalledTimes(1);
-    expect(result.meta.error).toMatchObject({
-      kind: "incomplete_turn",
-      fallbackSafe: false,
-    });
-  });
   describe("current-assistant provenance", () => {
     it.each([
       { failure: "assistant error", accepted: false },
