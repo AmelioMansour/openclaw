@@ -64,17 +64,17 @@ it("opens agent avatar selection from the keyboard and respects the busy state",
   await page.getByRole("button", { name: "Upload", exact: true }).click();
   const input = container.querySelector<HTMLInputElement>('input[type="file"]');
   assert(input, "Missing avatar file input");
-  const openPicker = vi.spyOn(input, "click").mockImplementation(() => {});
+  const openFilePicker = vi.spyOn(input, "click").mockImplementation(() => {});
   const button = nativeButton("Choose image…");
   button.focus();
   expect(document.activeElement).toBe(button);
   await userEvent.keyboard("{Enter} ");
-  expect(openPicker).toHaveBeenCalledTimes(2);
+  expect(openFilePicker).toHaveBeenCalledTimes(2);
 
   mounted.update({ ...props, access: { ...props.access, canUpdateIdentity: false } });
   expect(button.disabled).toBe(true);
   button.click();
-  expect(openPicker).toHaveBeenCalledTimes(2);
+  expect(openFilePicker).toHaveBeenCalledTimes(2);
   await userEvent.keyboard("{Escape}");
   expect(popover?.matches(":popover-open")).toBe(false);
 });
