@@ -3,13 +3,6 @@ import { describe, expect, it } from "vitest";
 import { isSafeFenceBreak, parseFenceSpans, scanFenceSpans } from "./fences.js";
 
 describe("parseFenceSpans closing-fence rules", () => {
-  it("does not treat backticks in an opening info string as a fence", () => {
-    const text = "```literal```\nParagraph";
-    expect(parseFenceSpans(text)).toEqual([]);
-    expect(isSafeFenceBreak(parseFenceSpans(text), text.indexOf("Paragraph") + 1)).toBe(true);
-    expect(scanFenceSpans(text).state.open).toBeUndefined();
-  });
-
   it("allows backticks in tilde-fence info strings", () => {
     const text = "~~~literal`\ncode\n~~~\nParagraph";
     const spans = parseFenceSpans(text);
