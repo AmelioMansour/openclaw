@@ -84,12 +84,83 @@ absolute deltas and sample counts; this workload does not measure event-loop tai
 promotion, native SQL, or whole-Gateway performance. The measured loop reattaches
 synthetic reference cells directly, excluding worker admission and transport costs.
 
+## Retained Buffer pool storage
+
+These synthetic probes keep the production owners live while interleaving small
+retained values with disposable pooled allocations. They report distinct backing
+stores, logical bytes, and retained backing bytes. Read the runtime's observed
+slab size: `Buffer.poolSize` need not equal the backing allocation's byte length.
+Do not assume an 8 KiB pool. Sparse insertion is the amplification case; adjacent
+small values can share a slab efficiently.
+
+```sh
+node --import ./scripts/tsx.mjs scripts/perf/gateway-buffer-pool-retention.ts
+node --expose-gc --import ./scripts/tsx.mjs scripts/perf/process-output-pool-retention.ts
+node --expose-gc --import ./scripts/tsx.mjs scripts/perf/command-capture-pool-retention.ts
+node --expose-gc --import ./scripts/tsx.mjs scripts/perf/audio-queue-pool-retention.ts --site voice
+node --expose-gc --import ./scripts/tsx.mjs scripts/perf/audio-queue-pool-retention.ts --site meeting
+node --expose-gc --import ./scripts/tsx.mjs scripts/perf/audio-queue-pool-retention.ts --site transcription
+```
+
+Run identical workloads on baseline and candidate. Acceptance is unchanged output
+bytes and source-copy isolation, no unrelated pooled slabs retained by repaired
+owners, and collection after their normal release boundary. The Gateway owner
+probe covers registered list arrays and both ordinary and segmented shared
+response payloads. Process probes cover live output/poll retention and a real
+running child command, plus clipped and string captures. Audio probes cover
+provider-readiness/reconnect queues and a meeting capture transport fixture.
+Their fixed PCM workloads correspond to 6.4 seconds of voice readiness backlog,
+about 17 seconds of meeting input, and 20.5 seconds of transcription backlog.
+
+These are retained-storage measurements, not CPU, GC-rate, latency, or production
+saving estimates. Command allocation attribution uses stack inspection; do not
+reuse its timing as a throughput result. Audio and process probes support
+synthetic heap snapshots and release controls; keep snapshots local.
+
+For whole-Gateway attribution, use the synthetic state generator and the
+`diagnostics.heapSnapshot` procedure in [the retention runbook](heap-retention-runbook.md).
+Keep clients and mock providers alive through completed turns and capture.
+Deduplicate backing stores within each owner; different owners can share a slab,
+so their totals cannot be added as exclusive savings. Presence publications are
+transient: `listSystemPresence()` creates fresh arrays, and the delivery cache's
+weak keys do not keep those arrays alive between publications. Artificially
+retaining every roster would manufacture a lifetime absent from this flow.
+
 ## Retained heap
 
 Use the [heap retention runbook](heap-retention-runbook.md) to capture a main-isolate
 snapshot and run the streaming analyzer in aggregate-only mode with bounded host
 resources. It covers dominators, collections, duplicate strings, and session-key
 scaling without exporting snapshot payloads.
+
+### Main-isolate module census
+
+`scripts/gateway-heap-rig.mjs --module-census` records each loaded main-isolate
+script's URL, hash, UTF-8 source bytes (or separate WebAssembly binary bytes), and
+V8 code statistics after seeding and
+after the mixed-turn workload. It uses the rig's private child IPC descriptor;
+workers are excluded and no inspector network listener is opened. Run the dist
+build on the authorized benchmark host with a fresh synthetic root, for example:
+
+```sh
+node --import ./scripts/tsx.mjs scripts/gateway-heap-rig.mjs \
+  --root /path/to/fresh-run --minutes 10 --sessions 500 --clients 4 \
+  --port 41673 --turn-interval-ms 20000 --snapshot-minutes 10 --module-census
+```
+
+Use `--coverage` in a separate attribution run to record exact function/range
+execution during the workload. Coverage can retain code and change optimization;
+its timings and code residency are not uninstrumented performance evidence.
+Use `--idle-minutes 5` without coverage to stop workload traffic while leaving
+normal Gateway maintenance active, sample code statistics each minute, and
+capture a final idle snapshot. Use `--snapshot-minutes none` for paired timing
+and natural-GC observations without heap exports; it also skips the idle snapshot.
+Run retained-size captures separately and serially to avoid concurrent bulk writes.
+Census inspectors disconnect after each capture.
+Source bytes and V8 code statistics are not dominator-retained bytes: use the
+heap snapshot analyzer for retained-size attribution. All fixtures and mock
+provider responses are synthetic; this workload does not reproduce a private
+production plugin configuration or measure provider-network latency.
 
 ## Released session authority
 
@@ -4988,6 +5059,35 @@ barrier before warmup. Use identical work counts, the shared quiet-slot lock and
 and swap the interleaved CPU placements in the second pair. Keep maintenance
 settings identical. Apply the campaign's absolute-delta and sample-count rules;
 run matched identical-source controls before interpreting adverse GC or promotion.
+
+## Session replica listener installation
+
+`session-actor-listener-measure.ts` sends 32 prepared, immutable full-entry
+postimages through the real row-change dispatcher and replica installation owner.
+Each entry has a saved instruction snapshot and nested plugin results. It checks
+content, frozen nested values, and mutation rejection, and reports full-entry
+clones separately from other clones during a separate 32-install diagnostic pass.
+Serialized clone bytes describe copied payload size, not V8 allocation.
+
+```sh
+node --import ./scripts/tsx.mjs scripts/perf/session-actor-listener-measure.ts \
+  --state-dir /path/to/private-state --iterations 100000 \
+  --start-at <shared-future-epoch-ms> --output listener.json
+```
+
+Save an unchanged owner beside the current source and select it with
+`--replica-owner src/config/sessions/session-actor-replica.baseline.ts` for the
+baseline. Run concurrent pairs under one quiet lock and the shared guard, with
+separate state directories, synchronized warm starts, and swapped interleaved
+CPUs in the second pair. Default runs measure untraced CPU, installation latency,
+event-loop delay, and per-kind GC totals/tails/maxima with sample counts. Use
+`--allocations` in separate paired runs to sample allocation including collected
+objects; do not gate timing on those instrumented runs. Apply the campaign's
+absolute-delta and sample-count rules, including matched identical-source
+controls before interpreting adverse GC. Acceptance is unchanged immutable
+contents and reduced copying/allocation without a material CPU or tail regression.
+This measures prepared native-style notification installation, excluding producer
+decoding, worker cold-freezing, Gateway traffic, and RPC latency.
 
 ## Native worker CPU sampling
 
