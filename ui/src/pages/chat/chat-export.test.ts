@@ -6,7 +6,10 @@ import { exportCurrentChat } from "./chat-export.ts";
 import type { ChatHistoryResult } from "./chat-history-snapshot.ts";
 import { makeChatHost } from "./chat-host.test-support.ts";
 
-vi.mock("../../lib/download.ts", () => ({ downloadTextFile: vi.fn() }));
+vi.mock("../../lib/download.ts", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../lib/download.ts")>()),
+  downloadTextFile: vi.fn(),
+}));
 afterEach(() => vi.clearAllMocks());
 
 function fixture(

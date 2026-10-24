@@ -133,7 +133,9 @@ suite.define(() => {
           .locator(".chat-thread-inner")
           .getByText("Export marker 160", { exact: false })
           .waitFor();
-        expect(await page.getByText(messages[0].content, { exact: true }).count()).toBe(0);
+        const firstMessage = messages[0];
+        assert(firstMessage, "paginated export fixture needs an earliest message");
+        expect(await page.getByText(firstMessage.content, { exact: true }).count()).toBe(0);
         expect(await gateway.getRequests("chat.history")).toHaveLength(0);
 
         await composer.fill(command);
