@@ -1,10 +1,11 @@
-import { createEffect, createMemo, createSignal, onCleanup, onSettled } from "solid-js";
+import { createEffect, createMemo, createSignal, onSettled } from "solid-js";
 import {
   isStaleChunkImportError,
   retryControlUiImport,
   retryStaleChunkReloadWhenReachable,
 } from "../../app/stale-chunk-reload.ts";
 import { shouldHandleNavigationClick } from "../../lib/navigation-click.ts";
+import { elementRef } from "../../lib/reactive/element-ref.ts";
 import type { Overlay } from "../overlay-lifecycle.ts";
 import { containsComposed } from "../overlay-registry.ts";
 import { MENU_FORM_CONTROL_SELECTOR } from "./menu-form-controls.ts";
@@ -23,18 +24,10 @@ export function createMenuControls(): MenuControls {
   return {
     elements,
     ref() {
-      let current: HTMLElement | undefined;
-      onCleanup(() => {
-        if (current) {
-          elements.delete(current);
-        }
+      return elementRef((element: HTMLElement) => {
+        elements.add(element);
+        return () => elements.delete(element);
       });
-      return (element) => {
-        if (current) {
-          elements.delete(current);
-        }
-        elements.add((current = element));
-      };
     },
   };
 }
@@ -97,6 +90,14 @@ export function useMenuMachine(
     revision();
     return runtime;
   };
+  // Rows share one rendered snapshot; imperative navigation still reads the live machine.
+  const presentation = createMemo(
+    () => {
+      const loaded = current();
+      return loaded ? { runtime: loaded, api: loaded.read() } : undefined;
+    },
+    { lazy: true },
+  );
   const run = (intent: (loaded: MenuRuntime) => void) => {
     if (runtime) {
       intent(runtime);
@@ -156,6 +157,7 @@ export function useMenuMachine(
       loading = false;
       pending = [];
       setError(reason);
+      notify();
     }
   };
   onSettled(() => {
@@ -203,7 +205,10 @@ export function useMenuMachine(
     const editing =
       event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement;
     if (event.key === "Escape") {
-      overlay.keydown(event);
+      // A child can retain focus on its parent trigger before navigation loads, too.
+      if (![...overlay.children].some((child) => child.open)) {
+        overlay.keydown(event);
+      }
       return;
     }
     if (
@@ -279,7 +284,7 @@ export function useMenuMachine(
     runtime: current,
     items,
     itemRef,
-    highlightedValue: () => current()?.read().highlightedValue ?? null,
+    highlightedValue: () => presentation()?.api.highlightedValue ?? null,
     highlightedValueNow: () => runtime?.service.context.get("highlightedValue") ?? null,
     setHighlightedValue,
     typeahead: (key) => run((loaded) => loaded.service.send({ type: "TYPEAHEAD", key })),
@@ -294,6 +299,7 @@ export function useMenuMachine(
       }
     },
     item(value, disabled, type, checked = false, label = value) {
+      const rendered = presentation();
       return {
         id: `${overlay.id}:${value}`,
         "data-scope": "menu",
@@ -304,7 +310,7 @@ export function useMenuMachine(
         "data-value": value,
         "data-valuetext": label,
         tabIndex: -1,
-        ...current()?.item(value, disabled, type, checked, label),
+        ...rendered?.runtime.item(rendered.api, value, disabled, type, checked, label),
         // Preserve cold entry focus without echoing machine-owned focus into its queue.
         onFocusIn: () => {
           if (runtime?.service.context.get("highlightedValue") !== value) {
