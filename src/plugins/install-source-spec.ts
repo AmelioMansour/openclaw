@@ -15,8 +15,11 @@ export function resolveFileNpmSpecToLocalPath(
   }
   if (rest.startsWith("///") || rest.startsWith("//localhost/")) {
     try {
+      const url = new URL(trimmed);
+      // Bun's fileURLToPath can preserve malformed escapes instead of rejecting them.
+      decodeURIComponent(url.pathname);
       // URL paths need percent decoding and native Windows drive handling.
-      return { ok: true, path: fileURLToPath(trimmed) };
+      return { ok: true, path: fileURLToPath(url) };
     } catch {
       return { ok: false, error: "unsupported file: URL: invalid local path" };
     }
