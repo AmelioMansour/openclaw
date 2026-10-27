@@ -92,12 +92,36 @@ function splitGitSpecRef(input: string): { base: string; ref?: string } {
   ) {
     const base = input.slice(0, atIndex);
     const ref = normalizeOptionalString(input.slice(atIndex + 1));
-    if (ref && isGitSpecBase(base)) {
+    // Preserve the legacy full-path interpretation of absolute .git repositories.
+    // An explicit ref on a .git repository still splits after that suffix.
+    if (
+      process.platform === "win32" &&
+      path.isAbsolute(input) &&
+      input.endsWith(".git") &&
+      !base.endsWith(".git")
+    ) {
+      continue;
+    }
+    // A native path ancestor is not a ref: Git refs cannot contain backslashes.
+    if (ref && isGitSpecBase(base) && !(process.platform === "win32" && ref.includes("\\"))) {
       return { base, ref };
     }
   }
 
   return { base: input };
+}
+
+function isLocalGitPath(value: string): boolean {
+  return (
+    value.startsWith("./") ||
+    value.startsWith("../") ||
+    value.startsWith("~/") ||
+    (process.platform === "win32" &&
+      (value.startsWith(".\\") ||
+        value.startsWith("..\\") ||
+        value.startsWith("~\\") ||
+        path.isAbsolute(value)))
+  );
 }
 
 function isGitSpecBase(value: string): boolean {
@@ -107,9 +131,7 @@ function isGitSpecBase(value: string): boolean {
     looksLikeUrlGitSpecBase(value) ||
     looksLikeScpGitUrl(value) ||
     value.endsWith(".git") ||
-    value.startsWith("./") ||
-    value.startsWith("../") ||
-    value.startsWith("~/")
+    isLocalGitPath(value)
   );
 }
 
@@ -182,7 +204,7 @@ export function parseGitPluginSpec(raw: string): ParsedGitPluginSpec | null {
     return null;
   }
 
-  const localPath = base.startsWith("./") || base.startsWith("../") || base.startsWith("~/");
+  const localPath = isLocalGitPath(base);
   let normalized: { url: string; label: string };
   if (looksLikeGitHubRepoShorthand(base) || looksLikeGitHubHostPath(base)) {
     const repo = stripGitSuffix(base.replace(/^github\.com\//i, ""));

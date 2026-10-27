@@ -151,6 +151,35 @@ async function installWithSecurityEvents(options: Parameters<typeof installPlugi
 }
 
 describe("parseGitPluginSpec", () => {
+  it.skipIf(process.platform !== "win32").each([
+    [".\\plugin fixtures\\local ü 空", "main"],
+    ["..\\plugin fixtures\\local ü 空", "main"],
+    ["C:\\plugin fixtures\\local ü 空", "main"],
+    ["C:/repos/@acme/plugin.git", "feature/release.git"],
+  ])("resolves a native Windows local repository and its ref: %s", (repository, ref) => {
+    const expectedPath = path.resolve(repository);
+    const parsed = expectParsedGitSpec(`git:${repository}@${ref}`);
+    expect(parsed).toMatchObject({ url: expectedPath, ref });
+    expect(expectParsedGitSpec(parsed.normalizedSpec)).toMatchObject({
+      url: expectedPath,
+      ref,
+    });
+  });
+
+  it
+    .skipIf(process.platform !== "win32")
+    .each([
+      "C:\\repos\\@acme\\plugin.git",
+      "C:/repos/@acme/plugin.git",
+      "C:\\repos/@acme/plugin.git",
+      "C:/repos/team@acme/plugin.git",
+    ])("preserves an @ in an absolute repository ancestor: %s", (repository) => {
+    expect(expectParsedGitSpec(`git:${repository}`)).toMatchObject({
+      url: path.resolve(repository),
+      ref: undefined,
+    });
+  });
+
   it.each([
     ["git:github.com/acme/demo@v1.2.3", "v1.2.3"],
     ["git:acme/demo@feature/foo", "feature/foo"],
