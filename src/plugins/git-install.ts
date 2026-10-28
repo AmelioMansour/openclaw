@@ -92,6 +92,14 @@ function splitGitSpecRef(input: string): { base: string; ref?: string } {
   ) {
     const base = input.slice(0, atIndex);
     const ref = normalizeOptionalString(input.slice(atIndex + 1));
+    // An @ at the start of a local path component belongs to that ancestor.
+    if (
+      process.platform === "win32" &&
+      (isLocalGitPath(base) || /^file:\/\//i.test(base)) &&
+      /[\\/]$/.test(base)
+    ) {
+      continue;
+    }
     // Preserve the legacy full-path interpretation of absolute .git repositories.
     // An explicit ref on a .git repository still splits after that suffix.
     if (
@@ -215,11 +223,13 @@ export function parseGitPluginSpec(raw: string): ParsedGitPluginSpec | null {
   } else {
     return null;
   }
+  // A normalized absolute Windows path can otherwise make a .git-ending ref look like a repository.
+  const refSeparator = localPath && process.platform === "win32" ? "#" : "@";
   return {
     input: trimmed,
     ...normalized,
     ref: split.ref,
-    normalizedSpec: `${GIT_SPEC_PREFIX}${normalized.url}${split.ref ? `@${split.ref}` : ""}`,
+    normalizedSpec: `${GIT_SPEC_PREFIX}${normalized.url}${split.ref ? `${refSeparator}${split.ref}` : ""}`,
   };
 }
 
