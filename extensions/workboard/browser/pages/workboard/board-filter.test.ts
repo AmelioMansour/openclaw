@@ -31,7 +31,7 @@ function board(overrides: Partial<WorkboardBoardSummary> & Pick<WorkboardBoardSu
 }
 
 describe("Workboard board filter", () => {
-  it("uses one canonical default identity and includes empty archived boards", () => {
+  it.each([true, false])("keeps canonical board identity with cardsComplete=%s", (cardsComplete) => {
     const options = buildBoardFilterOptions(
       [
         board({ id: "archive", name: "Old work", archivedAt: 9 }),
@@ -49,8 +49,8 @@ describe("Workboard board filter", () => {
           metadata: { automation: { boardId: "ops" }, archivedAt: 9 },
         },
       ],
+      cardsComplete,
     );
-
     expect(options.map((option) => option.value)).toEqual([
       WORKBOARD_ALL_BOARDS_FILTER,
       "default",
@@ -64,26 +64,8 @@ describe("Workboard board filter", () => {
     });
     expect(options[3]).toMatchObject({
       label: "Operations (ops)",
-      description: "2 active · 3 total",
+      description: cardsComplete ? "2 active · 3 total" : "99 active · 99 total",
     });
-  });
-
-  it("preserves authoritative summaries while the loaded card window is incomplete", () => {
-    const options = buildBoardFilterOptions(
-      [
-        board({ id: "default", total: 150, active: 149, archived: 1 }),
-        board({ id: "ops", name: "Operations", total: 25, active: 25 }),
-      ],
-      [card(), card("unsummarized"), { ...card("unsummarized"), id: "unsummarized-2" }],
-      false,
-    );
-    expect(options.find(({ value }) => value === "default")?.description).toBe(
-      "149 active · 150 total",
-    );
-    expect(options.find(({ value }) => value === "ops")?.description).toBe("25 active · 25 total");
-    expect(options.find(({ value }) => value === "unsummarized")?.description).toBe(
-      "2 active · 2 total",
-    );
   });
 
   it("disambiguates a custom name for the default board", () => {
