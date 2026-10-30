@@ -8,16 +8,13 @@ import {
   Show,
 } from "solid-js";
 import type { GatewayBrowserClient } from "../../api/gateway.ts";
-import type { SkillStatusReport } from "../../api/types.ts";
 import type { SolidRouteProps } from "../../app-route-types.tsx";
-import type { ApplicationContext, ApplicationGatewaySnapshot } from "../../app/context.ts";
 import {
   hasOperatorAdminAccess,
   hasOperatorReadAccess,
   hasOperatorWriteAccess,
 } from "../../app/operator-access.ts";
 import { Icon } from "../../components/solid/icon.tsx";
-import { SettingsPageHeader } from "../../components/solid/settings-ui.tsx";
 import { SettingsWorkspace } from "../../components/solid/settings-workspace.tsx";
 import { canCallGatewayMethod } from "../../lib/gateway-methods.ts";
 import { createPageRequest, type PageReadResult } from "../../lib/page-request.ts";
@@ -31,6 +28,7 @@ import { observeState } from "../../lib/reactive/observe-state.ts";
 import { searchClawHub } from "../../lib/skills/clawhub-search.ts";
 import {
   closeClawHubDetail,
+  createSkillsChangeReloader,
   installFromClawHub,
   installSkill,
   loadClawHubDetail,
@@ -47,26 +45,20 @@ import {
   type SkillsState,
 } from "../../lib/skills/index.ts";
 import { PluginIconOwner, pluginIconFetchContext } from "../plugins/plugin-icon-owner.ts";
-import { PluginsHubHeader } from "../plugins/plugins-hub-header.tsx";
 import { PLUGINS_HUB_PANEL_ID } from "../plugins/plugins-hub.ts";
 import { createSkillLibrary } from "./library-state.ts";
 import { SkillLibrary, SkillLibraryDialogs, SkillLibraryFeedback } from "./library-view.tsx";
+import { createSkillsMutationPresentation } from "./mutation-presentation.ts";
+import { SkillsHeader } from "./skills-header.tsx";
 import { createSkillsData } from "./skills-page-state.ts";
-import type { SkillDetailTab, SkillsPresentation } from "./view-types.ts";
+import type {
+  ClawHubDetailReceipt,
+  SkillDetailTab,
+  SkillsPageProps,
+  SkillsPresentation,
+  SkillsRouteData,
+} from "./view-types.ts";
 import { Skills } from "./view.tsx";
-
-export type SkillsRouteData = {
-  gateway: ApplicationContext["gateway"];
-  gatewaySnapshot: ApplicationGatewaySnapshot;
-  agents: ApplicationContext["agents"];
-  selectedAgentId: string | null;
-  selectionIntentRevision: number;
-  report: SkillStatusReport | null;
-  error: string | null;
-  clawhubRef?: string;
-};
-
-export type SkillsPageProps = { routeData?: SkillsRouteData; surface?: "discovery" | "settings" };
 
 export function createSkillsRenderer(surface: "discovery" | "settings") {
   return (props: SolidRouteProps<SkillsRouteData>) => (
@@ -125,14 +117,7 @@ export function SkillsPage(props: SkillsPageProps) {
       return outcome.value;
     });
   });
-  const [detailReceipt, setDetailReceipt] = createSignal<{
-    client: GatewayBrowserClient | null;
-    epoch: number;
-    agentId: string | null;
-    agentRevision: number;
-    ref: string;
-    completion: ReturnType<typeof loadClawHubDetail>;
-  } | null>(null);
+  const [detailReceipt, setDetailReceipt] = createSignal<ClawHubDetailReceipt | null>(null);
   const [searchCompletion, setSearchCompletion] = createSignal<Promise<PageReadResult> | null>(
     null,
   );
@@ -202,6 +187,18 @@ export function SkillsPage(props: SkillsPageProps) {
   const detailError = createMemo(() => skills.read().clawhubDetailError);
   const detailAgent = createMemo(() => skills.read().skillsAgentId);
   const detailAgentRevision = createMemo(() => skills.read().skillsAgentRevision);
+  const mutations = createSkillsMutationPresentation({
+    state: data,
+    readSkills: () => skills.read().skillsReport,
+    scope: () => ({
+      client: detailClient(),
+      epoch: detailEpoch(),
+      agentId: detailAgent(),
+      agentRevision: detailAgentRevision(),
+    }),
+    readEpoch: () => gateway.readEpoch(),
+    active: () => active,
+  });
   const readClawHubDetail = createMemo(() => {
     const client = detailClient();
     const epoch = detailEpoch();
@@ -235,6 +232,10 @@ export function SkillsPage(props: SkillsPageProps) {
     config?.revision();
     return context.config;
   });
+  function retirePresentation() {
+    library.retire();
+    mutations.retire();
+  }
   const clawhubIcons = new PluginIconOwner({
     kind: "catalog",
     getFetchContext: () => pluginIconFetchContext(context),
@@ -268,7 +269,7 @@ export function SkillsPage(props: SkillsPageProps) {
     (current, previous) => {
       if (!previous || current.route !== previous.route || current.surface !== previous.surface) {
         if (previous && current.surface !== previous.surface) {
-          library.retire();
+          retirePresentation();
         }
         admittedSurface = current.surface;
         syncSelection();
@@ -285,12 +286,12 @@ export function SkillsPage(props: SkillsPageProps) {
   );
   onSettled(() => {
     const stopLifecycle = context.lifecycleAbortSignal
-      ? listen(context.lifecycleAbortSignal, "abort", () => library.retire(), { once: true })
+      ? listen(context.lifecycleAbortSignal, "abort", retirePresentation, { once: true })
       : () => undefined;
     let location = context.router.getState().location;
     const stopNavigation = context.router.subscribe((state) => {
       if (state.location !== location) {
-        library.retire();
+        retirePresentation();
         location = state.location;
       }
     });
@@ -330,13 +331,19 @@ export function SkillsPage(props: SkillsPageProps) {
         ],
       );
     };
+    const changes = createSkillsChangeReloader(data);
+    const stopChanges = context.gateway.subscribeEvents(changes.onEvent);
     // Icon reconciliation waits for result/detail publication to settle.
-    const stopSkills = skills.subscribe(() => onSettled(syncIcons));
+    const stopState = skills.subscribe(() => {
+      onSettled(syncIcons);
+      changes.onStateChange();
+    });
+    const stopSkills = () => [stopChanges, stopState].forEach((stop) => stop());
     syncSelection();
     syncIcons();
     return () => {
       active = false;
-      library.retire();
+      retirePresentation();
       retireSkillsReads(data);
       [stopLifecycle, stopNavigation, stopAgents, ...stopSelections, stopSkills].forEach((stop) =>
         stop(),
@@ -381,9 +388,9 @@ export function SkillsPage(props: SkillsPageProps) {
   function reconcileAgentState() {
     const agentState = context.agents.state;
     const previousAgentId = data.skillsAgentId;
-    setSkillsAgentId(data, agentSelection().state.selectedId, library.retire);
+    setSkillsAgentId(data, agentSelection().state.selectedId, retirePresentation);
     if (admittedSurface === "discovery" && agentState.agentsList) {
-      reconcileSkillsAgentId(data, agentState.agentsList, library.retire);
+      reconcileSkillsAgentId(data, agentState.agentsList, retirePresentation);
     }
     if (previousAgentId !== data.skillsAgentId) {
       selectSkill(null);
@@ -392,6 +399,7 @@ export function SkillsPage(props: SkillsPageProps) {
   }
 
   function invalidateSkillRequests() {
+    mutations.retire();
     library.invalidateRequests();
     retireSkillsReads(data);
     setDetailReceipt(null);
@@ -405,6 +413,7 @@ export function SkillsPage(props: SkillsPageProps) {
   }
 
   function resetLoadedSkillState() {
+    mutations.retire();
     retireSkillsReads(data);
     setDetailReceipt(null);
     library.reset();
@@ -438,7 +447,7 @@ export function SkillsPage(props: SkillsPageProps) {
       reconcileAgentState();
       return;
     }
-    setSkillsAgentId(data, route.selectedAgentId, library.retire);
+    setSkillsAgentId(data, route.selectedAgentId, retirePresentation);
     if (route.selectedAgentId && selection.selectedId !== route.selectedAgentId) {
       agentSelection().set(route.selectedAgentId);
     }
@@ -588,23 +597,11 @@ export function SkillsPage(props: SkillsPageProps) {
 
   return (
     <openclaw-skills-page>
-      {surface() === "discovery" ? (
-        <PluginsHubHeader
-          active="skills"
-          onSelect={(tab) => {
-            if (tab !== "skills") {
-              context.navigate(tab);
-            }
-          }}
-          secondaryAction={{
-            label: t("skillDiscovery.settings"),
-            icon: <Icon name="settings" />,
-            onClick: () => navigateSkills("skill-settings"),
-          }}
-        />
-      ) : (
-        <SettingsPageHeader title={t("tabs.skills")} subtitle={t("subtitles.skills")} />
-      )}
+      <SkillsHeader
+        surface={surface()}
+        onNavigate={(tab) => context.navigate(tab)}
+        onSettings={() => navigateSkills("skill-settings")}
+      />
       <SettingsWorkspace>
         <div
           id={surface() === "discovery" ? PLUGINS_HUB_PANEL_ID : undefined}
@@ -613,6 +610,15 @@ export function SkillsPage(props: SkillsPageProps) {
         >
           <Skills
             state={viewState()}
+            mutationSkills={mutations.rows()}
+            saving={mutations.saving()}
+            toggleSavingSkillKey={mutations.toggle()?.skillKey}
+            toggleDisabled={
+              agents.read().agentsLoading ||
+              library.state.busy ||
+              ((skills.read().skillsLoading || skills.read().skillOperation !== null) &&
+                skills.read().skillOperation !== mutations.toggle()?.operation)
+            }
             readClawHubDetail={readClawHubDetail}
             readClawHubVerdicts={readClawHubVerdicts}
             readClawHubSearch={readClawHubSearch}
@@ -667,7 +673,10 @@ export function SkillsPage(props: SkillsPageProps) {
             onRefresh={() => void refreshPage()}
             onToggle={(key, enabled) => {
               if (canUpdateSkills()) {
-                void updateSkillEnabled(data, key, enabled, canUpdateSkills);
+                void mutations.run(() => updateSkillEnabled(data, key, enabled, canUpdateSkills), {
+                  skillKey: key,
+                  enabled,
+                });
               }
             }}
             onEdit={(key, value) => {
@@ -677,12 +686,12 @@ export function SkillsPage(props: SkillsPageProps) {
             }}
             onSaveKey={(key) => {
               if (canUpdateSkills()) {
-                void saveSkillApiKey(data, key, canUpdateSkills);
+                void mutations.run(() => saveSkillApiKey(data, key, canUpdateSkills));
               }
             }}
             onInstall={(skillKey, name, installId) => {
               if (canInstallSkills()) {
-                void installSkill(data, skillKey, name, installId);
+                void mutations.run(() => installSkill(data, skillKey, name, installId));
               }
             }}
             onDetailOpen={selectSkill}
@@ -707,7 +716,7 @@ export function SkillsPage(props: SkillsPageProps) {
                 });
                 library.setImportOpen(true);
               } else {
-                void installFromClawHub(data, ref, version);
+                void mutations.run(() => installFromClawHub(data, ref, version));
               }
             }}
           />
