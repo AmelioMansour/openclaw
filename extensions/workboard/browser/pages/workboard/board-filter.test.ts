@@ -31,7 +31,7 @@ function board(overrides: Partial<WorkboardBoardSummary> & Pick<WorkboardBoardSu
 }
 
 describe("Workboard board filter", () => {
-  it.each([true, false])("keeps canonical board identity with cardsComplete=%s", (cardsComplete) => {
+  it.each([true, false])("keeps board identities, complete=%s", (cardsComplete) => {
     const options = buildBoardFilterOptions(
       [
         board({ id: "archive", name: "Old work", archivedAt: 9 }),
