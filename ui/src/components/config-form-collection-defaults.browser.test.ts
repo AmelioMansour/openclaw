@@ -4,6 +4,7 @@ import {
   renderNodeFixture,
   renderArrayFixture,
   renderObjectFixture,
+  expandConfigObjects,
 } from "../test-helpers/config-form-fixtures.tsx";
 
 type Options = Parameters<typeof renderNodeFixture>[1];
@@ -100,7 +101,7 @@ describe("config form collection defaults", () => {
     expect(onPatch).toHaveBeenCalledWith(["settings"], ["a", "custom"]);
   });
 
-  it("authors a nested inherited array item without dropping sibling defaults", () => {
+  it("authors a nested inherited array item without dropping sibling defaults", async () => {
     const untouched = entry("beta", "two", "keep-two");
     const itemSchema = object({
       name: string,
@@ -110,6 +111,7 @@ describe("config form collection defaults", () => {
       array(itemSchema, [entry("alpha", "one", "keep-one"), untouched]),
       undefined,
     );
+    await expandConfigObjects(container);
 
     const labels = Array.from(
       container.querySelectorAll<HTMLInputElement>("input[aria-label='Label']"),
