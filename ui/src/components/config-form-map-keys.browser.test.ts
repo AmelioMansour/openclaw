@@ -14,9 +14,7 @@ function formFixture(
   const state = createInitialConfigState();
   state.configSchema = analysis.schema;
   state.configForm = structuredClone({ aliases });
-  if (original) {
-    state.configFormOriginal = { aliases };
-  }
+  state.configFormOriginal = original ? { aliases } : null;
   const onPatch = (path: Array<string | number>, value: unknown) =>
     updateConfigFormValue(state, path, value);
   const container = document.body.appendChild(document.createElement("div"));
@@ -144,7 +142,9 @@ describe("config form map key ownership", () => {
       flush();
       edit(input("[data-collection-draft-key]", host), name, "input");
       edit(input("[data-collection-draft-value]", host), "before", "input");
-      if (action === "add") edit(input('[aria-label="Entry value"]'), "edited", "input");
+      if (action === "add") {
+        edit(input('[aria-label="Entry value"]'), "edited", "input");
+      }
       renderValue();
       flush();
       expect(input("[data-collection-draft-key]", host)?.value).toBe(name);
