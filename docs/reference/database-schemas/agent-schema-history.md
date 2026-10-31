@@ -54,6 +54,8 @@ backup and its matching build, not just reinstalling the older package.
 | 35      | Native PostgreSQL ordering for predicate-proven non-null partial-index keys; metadata-only SQLite advance ([#183443](https://github.com/openclaw/openclaw/pull/183443))                                                                                | `Unreleased` |
 | 36      | Indexed PostgreSQL exact-path memory candidates with unchanged ranking; metadata-only SQLite advance                                                                                                                                                   | `Unreleased` |
 | 37      | Ordered cold transcript archive chunks with a 64 MiB uncompressed bound per file                                                                                                                                                                       | `Unreleased` |
+| 38      | PostgreSQL full-text search splits punctuation-joined tokens like SQLite FTS5 ([#183547](https://github.com/openclaw/openclaw/pull/183547)); metadata-only SQLite advance                                                                              | `Unreleased` |
+| 39      | Retained cold transcript navigation for bounded history reads without restoration                                                                                                                                                                      | `Unreleased` |
 
 Schema 1 first appeared in `v2026.5.30-beta.1` and was also written by the
 extended-stable `v2026.7.35`. Versions 2, 4, 5–6, and 7 were development-only
@@ -73,6 +75,58 @@ including shared agent registration. Run `openclaw doctor --fix` with OpenClaw
 be verified, follow the explicit agent-restoration instructions it reports, then
 rerun Doctor before upgrading the copy. Schema-8 and later session migrations
 remain supported.
+
+### Agent schema 39
+
+Schema 39 permits cold transcript payload references in `transcript_events`.
+Archival retains compact navigation, identities, active-path positions, and index
+state while the immutable archive remains the canonical payload. Bounded history
+pages and initial message subscriptions select through those rows and verify only
+the archive chunks containing their selected payloads. They do not restore the
+transcript or wait for writer admission. Branch, reset, visibility, and cursor
+rules remain with the existing history owner.
+
+Doctor backfills existing archives independently under maintenance custody,
+preserving one verified backup per database it changes in each invocation. Archive
+work shares a ten-minute budget across databases; backup time is separate. The
+deadline is checked between archives, so an in-flight archive finishes atomically
+even if it exceeds the budget. Interrupted or failed archives remain pending.
+Doctor and the update receipt report migrated and pending counts when the budget
+is exhausted, with a recoverable warning that navigation resumes on the next
+Doctor run. Pending archives keep their existing cold-restore behavior; this
+warning does not fail or roll back an update.
+
+Every update-time Doctor pass runs this repair even after the schema is current,
+skipping already-qualified archives, so subsequent updates continue the backfill.
+Run `openclaw doctor --fix` to continue sooner. Ordinary Gateway restarts do not
+schedule it; direct package replacements should run Doctor before startup.
+Resumed invocations keep the verified backup: the existing backup owner does not
+persist a verifiable association between a previous snapshot and this migration
+crossing, so finding an old backup directory alone is insufficient to reuse it.
+
+Backfill writes navigation directly without recompressing archived event bodies.
+Its maintenance connection reuses bounded prepared statements. Older archives
+with incomplete indexes still rebuild those indexes from their verified bodies
+within the same archive transaction.
+
+Retained navigation increases the working database's storage cost. Headers and
+exceptional imported envelopes whose native interpretation cannot be represented
+by bounded navigation keep their original inline bytes. Restoration still serves
+write-capable continuations, and full-history deletion removes both navigation
+and payload archives. No new retention setting or archive format is introduced.
+SQLite rebuilds the payload constraint without changing existing rows; PostgreSQL
+updates the equivalent constraint. Older builds refuse schema 39. Rollback needs
+the verified pre-upgrade database and archive backup with its matching binary.
+
+### Agent schema 38
+
+Schema 38 makes PostgreSQL full-text search split punctuation-joined words the
+way SQLite FTS5 does, so `server.py` matches `server` and `py`. The migration
+turns each stored `openclaw_search` generated column into a plain column kept by
+a `<table>_search_sync` trigger, then reparses existing rows once for the
+transcript index and every persisted search extension. SQLite advances schema
+metadata only. Rollback requires restoring the verified pre-upgrade backup with
+its matching build.
 
 ### Agent schema 37
 
@@ -396,7 +450,13 @@ databases retain identity storage and their existing native byte accounting.
 The metadata holds navigation projections, report-selection facts, and exact
 context-budget sizes. Report deduplication and database size statistics use these
 facts without decoding unrelated bodies; selected body reads reconstruct the
-original text. No extension or new
+original text. Tree navigation keeps its native SQL projection for supported
+rows and decodes identity JSON in JavaScript when it exceeds SQLite's nesting
+limit. Actor hydration retains only the resulting navigation fields. Deep tool
+details and opaque custom entries remain unchanged, including existing rows.
+Model-context reads use the shared JavaScript projection for deep identity rows,
+including projected byte accounting; ordinary and compressed rows stay native.
+No extension or new
 SQLite file format is required. A runtime without Zstd can write identity rows,
 but refuses to decode an existing compressed row.
 

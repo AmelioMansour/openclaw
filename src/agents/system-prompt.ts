@@ -55,10 +55,6 @@ import { filterProjectScopedCuratedContextFiles } from "./project-memory-bootstr
 import { buildPromisedWorkPromptSection } from "./promised-work-prompt.js";
 import { sanitizeForPromptLiteral } from "./sanitize-for-prompt.js";
 import {
-  buildSkillWorkshopPromptSection,
-  SKILL_WORKSHOP_TOOL_NAME,
-} from "./skill-workshop-prompt.js";
-import {
   buildProjectContextSection,
   isBootstrapContextFile,
   prepareContextFilesForPrompt,
@@ -86,6 +82,7 @@ import type {
   SilentReplyPromptMode,
   SystemPromptRuntimeInfo,
 } from "./system-prompt.types.js";
+import { listToolPromptGuidance } from "./tool-prompt-guidance.js";
 import { AUTOMATIONS_TOOL_NAME } from "./tools/automations-tool-name.js";
 import { buildUiPresentationPrompt } from "./ui-presentation-prompt.js";
 import { buildProactiveSubagentOrchestrationSection } from "./ultra-orchestration.js";
@@ -527,9 +524,10 @@ export function buildAgentSystemPrompt(params: {
     deferredToolsDirectlyCallable: params.deferredToolsDirectlyCallable,
   });
   params.onRenderedSkillsPrompt?.(renderedSkillsPrompt);
-  const skillWorkshopSection = availableTools.has(SKILL_WORKSHOP_TOOL_NAME)
-    ? buildSkillWorkshopPromptSection()
-    : [];
+  const toolGuidanceSection = listToolPromptGuidance(availableTools).flatMap((section) => [
+    section,
+    "",
+  ]);
   const memorySection =
     isMinimal || params.includeMemorySection === false
       ? []
@@ -694,7 +692,7 @@ export function buildAgentSystemPrompt(params: {
     ],
     renderOpenClawToolWorkflowHints &&
       subagentStatusTools.length > 0 &&
-      `Never loop-poll ${subagentStatusTools.map((name) => (name === "subagents" ? "`subagents list`" : `\`${name}\``)).join("/")}.${availableTools.has("sessions_yield") ? " Announcing children: Wait with `sessions_yield`." : ""} Status only on-demand/intervention/debug/request.`,
+      `Never loop-poll ${subagentStatusTools.map((name) => (name === "subagents" ? "`subagents list`" : `\`${name}\``)).join("/")}.${availableTools.has("sessions_yield") && !inTurnCollectionGuidance ? " Announcing children: Wait with `sessions_yield`." : ""} Status only on-demand/intervention/debug/request.`,
     renderOpenClawToolWorkflowHints &&
       sessionLookupTools.length > 0 &&
       `Asked about another chat/group/session not in context: check ${sessionLookupTools.map((name) => `\`${name}\``).join("/")} before claiming no access.`,
@@ -733,7 +731,7 @@ export function buildAgentSystemPrompt(params: {
     ...careSection,
     ...buildOpenClawControlSection({ hasOpenClaw, hasGateway, hasExec, restartCommandsEnabled }),
     ...skillsSection,
-    ...skillWorkshopSection,
+    ...toolGuidanceSection,
     ...memorySection,
     params.modelAliasLines &&
       params.modelAliasLines.length > 0 &&
