@@ -1,0 +1,163 @@
+{
+  "head": "32e6b9e0621e700aba2935aa474b07e6c874535b",
+  "method": "Native Playwright fill/press Enter, production bundle isolated Gateway; one immediate read-only DOM snapshot per submission; no injection/interception/fake timers.",
+  "frames": [
+    {
+      "direction": "sent",
+      "time": 1793437782071,
+      "id": "4:d6ed8965-8567-4402-88f6-4efdc1b81e68",
+      "method": "config.get"
+    },
+    {
+      "direction": "sent",
+      "time": 1793437782073,
+      "id": "12:9a6007f9-51eb-4cf9-acc0-61f20ad0aaba",
+      "method": "config.schema"
+    },
+    {
+      "direction": "received",
+      "time": 1793437783692,
+      "id": "12:9a6007f9-51eb-4cf9-acc0-61f20ad0aaba",
+      "ok": true
+    },
+    {
+      "direction": "received",
+      "time": 1793437783821,
+      "id": "4:d6ed8965-8567-4402-88f6-4efdc1b81e68",
+      "ok": true
+    },
+    {
+      "direction": "sent",
+      "time": 1793437785842,
+      "id": "20:29cfa6f5-1b58-4b76-aafc-2604852ad73c",
+      "method": "config.set"
+    },
+    {
+      "direction": "received",
+      "time": 1793437786095,
+      "id": "20:29cfa6f5-1b58-4b76-aafc-2604852ad73c",
+      "ok": true
+    },
+    {
+      "direction": "sent",
+      "time": 1793437786095,
+      "id": "21:8759f1a5-28e1-4e9a-b4fb-418960794c56",
+      "method": "config.get"
+    }
+  ],
+  "passed": true,
+  "ready": {
+    "at": 1793437784682,
+    "nameMatches": false,
+    "scalarValue": "111",
+    "scalarValidity": {
+      "valid": true,
+      "rangeUnderflow": false,
+      "badInput": false,
+      "customError": false
+    },
+    "scalarAriaInvalid": "false",
+    "scalarFocused": false,
+    "nameFocused": false,
+    "sameForm": true,
+    "formNoValidate": true,
+    "saveEnabled": false,
+    "nameInViewport": true,
+    "scalarInViewport": true,
+    "saveInViewport": true
+  },
+  "readyPredicates": {
+    "nameVisible": true,
+    "scalarVisible": true,
+    "sameForm": true,
+    "noValidate": true
+  },
+  "invalid": {
+    "scalarFilledAt": 1793437784780,
+    "dirtyStartedAt": 1793437784780,
+    "beforeEnterAt": 1793437785097,
+    "enterReturnedAt": 1793437785436,
+    "dom": {
+      "at": 1793437785446,
+      "nameMatches": true,
+      "scalarValue": "not-numeric",
+      "scalarValidity": {
+        "valid": false,
+        "rangeUnderflow": false,
+        "badInput": false,
+        "customError": true
+      },
+      "scalarAriaInvalid": "true",
+      "scalarFocused": true,
+      "nameFocused": false,
+      "sameForm": true,
+      "formNoValidate": true,
+      "saveEnabled": true,
+      "nameInViewport": true,
+      "scalarInViewport": true,
+      "saveInViewport": true
+    },
+    "configSetAtSnapshot": 0,
+    "elapsedMs": 666
+  },
+  "invalidPredicates": {
+    "submittedWithinDebounce": true,
+    "nameMatches": true,
+    "invalidValueRetained": true,
+    "invalidNativeValidity": true,
+    "customError": true,
+    "focusMovedToScalar": true,
+    "saveRemainsEnabled": true,
+    "noSetAtImmediateSnapshot": true
+  },
+  "corrected": {
+    "startedAt": 1793437785451,
+    "beforeEnterAt": 1793437785569,
+    "enterReturnedAt": 1793437785854,
+    "dom": {
+      "at": 1793437785976,
+      "nameMatches": true,
+      "scalarValue": "555",
+      "scalarValidity": {
+        "valid": true,
+        "rangeUnderflow": false,
+        "badInput": false,
+        "customError": false
+      },
+      "scalarAriaInvalid": "false",
+      "scalarFocused": false,
+      "nameFocused": false,
+      "sameForm": true,
+      "formNoValidate": true,
+      "saveEnabled": false,
+      "nameInViewport": true,
+      "scalarInViewport": true,
+      "saveInViewport": true
+    },
+    "requestAt": 1793437785842,
+    "ackAt": 1793437786095,
+    "requestWithinDebounce": true,
+    "acknowledged": true
+  },
+  "persisted": {
+    "nameMatches": true,
+    "scalarMatches": true
+  },
+  "correctedPredicates": {
+    "nativeEnterWithinDebounce": true,
+    "requestWithinDebounce": true,
+    "acknowledged": true,
+    "namePersisted": true,
+    "scalarPersisted": true
+  },
+  "stopSignaled": true,
+  "listenerStopped": true,
+  "attribution": {
+    "invalidSubmissionMs": 666,
+    "correctedRequestMs": 391,
+    "correctedAckMs": 644,
+    "configSetsBeforeCorrection": 0,
+    "postWriteConfigGet": true,
+    "field": "Discord Mention Aliases / Primary (string scalar, not numeric)"
+  }
+}
