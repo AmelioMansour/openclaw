@@ -144,7 +144,11 @@ describe("config form map key ownership", () => {
       flush();
       edit(input("[data-collection-draft-key]", host), name, "input");
       edit(input("[data-collection-draft-value]", host), "before", "input");
+      edit(input('input[aria-label="Entry value"]'), "edited", "input");
+      renderValue();
       flush();
+      expect(input("[data-collection-draft-key]", host)?.value).toBe(name);
+      expect(input("[data-collection-draft-value]", host)?.value).toBe("before");
       add(host);
     }
     renderValue();
@@ -153,7 +157,7 @@ describe("config form map key ownership", () => {
       .item(action === "add" ? 1 : 0);
     edit(value, "edited", "input");
     expect(JSON.parse(serializeFormForSubmit(state))).toEqual({
-      aliases: { ...(action === "add" ? { primary: "before" } : {}), [name]: "edited" },
+      aliases: { ...(action === "add" ? { primary: "edited" } : {}), [name]: "edited" },
     });
     expect(Object.getPrototypeOf(state.configForm)).toBe(Object.prototype);
     expect(Object.getPrototypeOf(state.configForm!.aliases)).toBe(Object.prototype);
