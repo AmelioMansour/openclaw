@@ -15,11 +15,13 @@ import {
 } from "solid-js";
 import { Icon } from "../../components/solid/icon.tsx";
 import { ContextNewSessionAction } from "../../components/solid/new-session-link.tsx";
+import { SettingsSelect } from "../../components/solid/settings-select.tsx";
 import {
   SettingsPage,
   SettingsSection,
   SettingsStatus,
 } from "../../components/solid/settings-ui.tsx";
+import { registerSessionMenuEnglish } from "../../i18n/locales/en-session-menu.ts";
 import { formatUiError } from "../../lib/format-error.ts";
 import { presenceViewerLabel } from "../../lib/presence-users.ts";
 import { useOptionalApplication } from "../../lib/reactive/context.ts";
@@ -34,6 +36,8 @@ import { categoryDropHandlers, SessionsAdvancedFilters } from "./sessions-filter
 import { TranscriptSearchForm, TranscriptSearchResults } from "./transcript-search-view.tsx";
 import type { SessionsProps } from "./view-types.ts";
 import "../../styles/sessions.css";
+
+registerSessionMenuEnglish();
 
 const PAGE_SIZES = [10, 25, 50, 100] as const;
 
@@ -441,20 +445,16 @@ function SessionsTable(props: SessionsProps & { readRoster: () => RosterOutcome 
             })}
           </div>
           <div class="data-table-pagination__controls">
-            <select
+            <SettingsSelect
               class="data-table-pagination__size"
               aria-label={t("sessionsView.pageSize")}
               value={pageSizeValue()}
+              options={PAGE_SIZES.map((size) => ({
+                value: String(size),
+                label: t("sessionsView.rowsPerPage", { count: String(size) }),
+              }))}
               onChange={(e) => props.onPageSizeChange(Number(e.currentTarget.value))}
-            >
-              <For each={PAGE_SIZES}>
-                {(s) => (
-                  <option value={s} selected={s === props.pageSize}>
-                    {t("sessionsView.rowsPerPage", { count: String(s) })}
-                  </option>
-                )}
-              </For>
-            </select>
+            />
             {props.result?.hasMore && props.result.nextOffset != null ? (
               <button disabled={props.loading} onClick={() => props.onLoadMore()}>
                 {t("chat.selectors.loadMoreRosterSessions")}
