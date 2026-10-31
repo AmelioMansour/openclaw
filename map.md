@@ -17,7 +17,7 @@
 
 - Exact-head production Vite build passed.
 - Independent static reviewers found no confirmed introduced correctness findings.
-- The earlier pre-assertion startup blocker is now diagnosed and browser regression verified; see below. Code refresh remains local and unpushed pending canonical UI types. Remote stays f663fb18bd149f1825570c934f747c9d80b12587.
+- The earlier pre-assertion startup blocker is resolved and the browser regression is verified. After canonical UI types, lint and formatting completed successfully, the exact validated candidate e1382fde346f345695d70ff0eff6199b3b91d88f was fast-forward pushed without force. Remote branch SHA was verified; no merge performed.
 - Rejected child-patch coverage is still a useful extension and was not exercised by the shipped-route sequence above.
 
 ## Verified browser followthrough — October 31, 2026
@@ -31,6 +31,6 @@ No source, assertion, browser version or test gate was bypassed. PLAYWRIGHT_CHRO
 - Broader collection/config coverage:9files66tests PASS. Repeated with physically owned frozen/offline dependencies; downloaded0, install scripts disabled.
 - Two candidate file SHA256 values match the committed original worktree exactly.
 - Focused lint:0errors,1pre-existing reactivity warning on unchanged row code. Formatting:PASS.
-- Canonical UI typecheck remains a separate publication gate. A short initial budget interrupted an actively compiling native TypeScript process, not browser startup. Its retained private lock was preserved after verifying the owner AND associated descendants stopped; canonical types now run with an adequate bounded deadline. NO typecheck pass, code push or new hostedCI pass is claimed in this evidence revision.
+- Canonical UI typecheck:PASS using independently owned physical compiler dependencies. Focused lint:PASS(0errors,1pre-existing warning); formatting:PASS. The interrupted short-budget owner lock was preserved only after owner/descendant absence was verified, then the normal canonical gate completed successfully. [Final validation record](logs/map-final-validation-20261031.json). New hostedCI and ClawSweeper review must assess published e1382fde; old-head outcomes are not reused as exact-head approval.
 
 [Controlled matrix](logs/map-controlled-results-20261031.json) · [Import controls](logs/map-startup-controls-20261031.json) · [Minimal test source](logs/map-minimal-test-source-20261031.txt) · [Base red](logs/map-base-regression-20261031.log) · [Candidate green](logs/map-head-regression-20261031.log) · [66-test log](logs/map-head-adjacent-20261031.log). Private paths/tempnamespaces redacted.

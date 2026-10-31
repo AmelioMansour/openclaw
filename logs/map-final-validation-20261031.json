@@ -1,0 +1,38 @@
+{
+  "head": "e1382fde346f345695d70ff0eff6199b3b91d88f",
+  "canonicalTypecheck": {
+    "command": "node scripts/run-tsgo.mjs -p tsconfig.ui.json --incremental --tsBuildInfoFile .artifacts/tsgo-cache/map-ui-owned-deps-20261031.tsbuildinfo",
+    "exitCode": 0,
+    "compilerDependencies": "Physically owned inside isolated exact-head source archive; frozen offline install, downloaded0, install scripts disabled."
+  },
+  "focusedLint": {
+    "exitCode": 0,
+    "errors": 0,
+    "preexistingWarnings": 1
+  },
+  "format": {
+    "exitCode": 0
+  },
+  "chainExit": 0,
+  "chainOutput": "[openclaw] unsupported platform win32-x64; using oxlint.\n\n  ! solid(reactivity): This function should be passed to a tracked scope (like createEffect) or an event handler because it contains reactivity, or else changes will be ignored.\n    ,-[ui/src/components/config-form.node.collection-map.tsx:67:51]\n 66 |   const [renameError, setRenameError] = createSignal(\"\");\n 67 |   const keyValue = liveValue<HTMLInputElement>(() => key());\n    :                                                   ^^\n 68 |   const sensitiveState = createMemo(() =>\n    `----\n\nFound 1 warning and 0 errors.\nFinished in 1.7s on 2 files with 259 rules using 16 threads.\n[openclaw] unsupported platform win32-x64; using oxfmt.\nChecking formatting...\n\nAll matched files use the correct format.\nFinished in 24ms on 2 files using 16 threads.",
+  "tests": {
+    "controlledBaseFailures": 3,
+    "controlledHeadPasses": 3,
+    "minimalBasePass": 1,
+    "minimalHeadPass": 1,
+    "adjacentFiles": 9,
+    "adjacentTests": 66,
+    "ownedDepsRevalidationExit": 0
+  },
+  "sha256": {
+    "ui/src/components/config-form.node.collection-map.tsx": "ED4626C30F5B0883734A4A508DCCCCEA280FCC67937119A3A952FF435C67A21A",
+    "ui/src/components/config-form-collection-preserve.browser.test.ts": "965B233DD2CECDBFAC8ED35322405A605B5A3190F35F7E825B43183206136919"
+  },
+  "productionBuild": "Previously passed on this exact source head; source file hashes unchanged.",
+  "cleanup": {
+    "baseWorktreeClean": true,
+    "archiveSmokeRemovedAfterCanonicalCompilerJoined": true,
+    "noRemainingMapCompilerOrTestProcesses": true
+  },
+  "limits": "Local validation only. Hosted CI and ClawSweeper review must inspect the new published code head. No merge or UI-owner approval."
+}
