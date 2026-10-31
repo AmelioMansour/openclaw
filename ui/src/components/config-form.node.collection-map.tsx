@@ -183,6 +183,7 @@ export function ConfigMapField(props: MapProps): JSX.Element {
   const content = createMemo(() => resolveMapContent(props.params));
   let localEdit: { expected: unknown; retained: unknown } | undefined;
   let sourceRevision = 0;
+  let sourceSnapshot: { source: unknown; revision: number } | undefined;
   const draftSource = createMemo(() => {
     const source = props.params.sourceIdentity ?? props.params.value;
     if (localEdit && configValuesEqual(source, localEdit.expected)) {
@@ -194,7 +195,15 @@ export function ConfigMapField(props: MapProps): JSX.Element {
       sourceRevision += 1;
       localEdit = undefined;
     }
-    return { source, revision: sourceRevision };
+    // Unset maps use a symbol, which cannot survive JSON equality in a cloned wrapper.
+    if (
+      !sourceSnapshot ||
+      !Object.is(sourceSnapshot.source, source) ||
+      sourceSnapshot.revision !== sourceRevision
+    ) {
+      sourceSnapshot = { source, revision: sourceRevision };
+    }
+    return sourceSnapshot;
   });
   const patchChild: MapParams["onPatch"] = (path, value) => {
     const root = props.params.path;

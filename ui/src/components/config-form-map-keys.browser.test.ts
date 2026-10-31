@@ -6,7 +6,7 @@ import { flush } from "../test-helpers/solid-settle.ts";
 import { analyzeConfigSchema } from "./config-form.analyze.ts";
 
 function formFixture(
-  aliases: Record<string, unknown>,
+  aliases: Record<string, unknown> | undefined,
   schema: Parameters<typeof analyzeConfigSchema>[0],
   original = false,
 ) {
@@ -122,11 +122,11 @@ describe("config form map key ownership", () => {
 
   it.each(
     ["constructor", "prototype", "__proto__"].flatMap((name) =>
-      ["add", "rename"].map((action) => ({ name, action })),
+      ["add", "rename", "unset"].map((action) => ({ name, action })),
     ),
   )("edits own $name entries after $action without changing prototypes", ({ name, action }) => {
     const { state, container, renderValue, input, add } = formFixture(
-      { primary: "before" },
+      action === "unset" ? undefined : { primary: "before" },
       mapSchema({
         additionalProperties: {
           type: "string",
@@ -144,7 +144,7 @@ describe("config form map key ownership", () => {
       flush();
       edit(input("[data-collection-draft-key]", host), name, "input");
       edit(input("[data-collection-draft-value]", host), "before", "input");
-      edit(input('input[aria-label="Entry value"]'), "edited", "input");
+      if (action === "add") edit(input('[aria-label="Entry value"]'), "edited", "input");
       renderValue();
       flush();
       expect(input("[data-collection-draft-key]", host)?.value).toBe(name);
