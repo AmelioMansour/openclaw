@@ -34,3 +34,19 @@ No source, assertion, browser version or test gate was bypassed. PLAYWRIGHT_CHRO
 - Canonical UI typecheck:PASS using independently owned physical compiler dependencies. Focused lint:PASS(0errors,1pre-existing warning); formatting:PASS. The interrupted short-budget owner lock was preserved only after owner/descendant absence was verified, then the normal canonical gate completed successfully. [Final validation record](logs/map-final-validation-20261031.json). New hostedCI and ClawSweeper review must assess published e1382fde; old-head outcomes are not reused as exact-head approval.
 
 [Controlled matrix](logs/map-controlled-results-20261031.json) · [Import controls](logs/map-startup-controls-20261031.json) · [Minimal test source](logs/map-minimal-test-source-20261031.txt) · [Base red](logs/map-base-regression-20261031.log) · [Candidate green](logs/map-head-regression-20261031.log) · [66-test log](logs/map-head-adjacent-20261031.log). Private paths/tempnamespaces redacted.
+
+## Shipped-route preservation capture — October 31, 2026, 09:05 UTC
+
+This addresses the exact-head review request for the central **pending editor**, not just the final reset. A fresh isolated real Gateway served the existing exact-head production bundle. On the same mounted /settings/advanced page, native text input changed primary from 111 to333 and then444 while secondary=222 remained uncommitted. No app-state/DOM mutation, mocked RPC, network interception, fake timer, navigation or remount manufactured the preservation. Each sibling value was also read back from the isolated Gateway's persisted config before the next phase.
+
+![Shipped Settings map after primary becomes333: pending secondary222 remains](images/map-route-pending-333.png)
+
+![Same mounted shipped Settings map after primary becomes444: pending secondary222 remains](images/map-route-pending-444.png)
+
+![Pending editor still present after Gateway persisted primary444](images/map-route-acknowledged-444.png)
+
+[Timestamped redacted runtime trace](logs/map-successive-shipped-route-20261031.json) records the111,333,acknowledged333,444 and acknowledged444 snapshots, followed by persisted primary444 and secondary222 after native Add Entry. These are element-region screenshots from the shipped page, not component fixtures. No address bar, private paths, handoff credentials or endpoint addresses are included. Images were visually reviewed at native size. Owned fixture exited cleanly; listener absence verified.
+
+Scope limit: this successful sequence uses ordinary text input updates without an added Tab after every fill. An earlier additional Tab/blur probe recorded the pending controls absent at its444 snapshot and stopped; that path remains undiagnosed (including transient disabled/loading state), so no all-focus-transition guarantee or introduced defect is claimed.
+
+Hosted CI run41185485801 completed successfully on exact head e1382fde346f345695d70ff0eff6199b3b91d88f. The previous exact-head ClawSweeper review found0 findings but held for this shipped-route capture; a new review is required and is not presumed approved.

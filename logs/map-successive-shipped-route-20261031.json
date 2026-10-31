@@ -1,0 +1,50 @@
+{
+  "head": "e1382fde346f345695d70ff0eff6199b3b91d88f",
+  "route": "/settings/advanced",
+  "method": "Exact-head production bundle served by real isolated Gateway; native Playwright inputs; DOM reads only. Same mounted page throughout successive edits, no reload or injection.",
+  "states": [
+    {
+      "primary": "111",
+      "pendingKey": "secondary",
+      "pendingValue": "222",
+      "phase": "pending-111",
+      "at": "2026-10-31T09:05:27.178Z"
+    },
+    {
+      "primary": "333",
+      "pendingKey": "secondary",
+      "pendingValue": "222",
+      "phase": "pending-333",
+      "at": "2026-10-31T09:05:27.914Z",
+      "gatewayPersistedPrimary": "333"
+    },
+    {
+      "primary": "333",
+      "pendingKey": "secondary",
+      "pendingValue": "222",
+      "phase": "acknowledged-333",
+      "at": "2026-10-31T09:05:30.338Z"
+    },
+    {
+      "primary": "444",
+      "pendingKey": "secondary",
+      "pendingValue": "222",
+      "phase": "pending-444",
+      "at": "2026-10-31T09:05:35.726Z",
+      "gatewayPersistedPrimary": "444"
+    },
+    {
+      "primary": "444",
+      "pendingKey": "secondary",
+      "pendingValue": "222",
+      "phase": "acknowledged-444",
+      "at": "2026-10-31T09:05:44.791Z"
+    }
+  ],
+  "frames": [],
+  "persisted": {
+    "primary": "444",
+    "secondary": "222"
+  },
+  "passed": true
+}
