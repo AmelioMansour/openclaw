@@ -1,0 +1,50 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - JSON import "./control-ui-i18n-config.json" without import attributes (scripts/lib/control-ui-i18n-sync-plan.ts:2:41). Add `with { type: 'json' }`
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.5 [MAP_BASE]/ui
+
+ ×  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement undefined 667ms
+   → expected undefined to be 'backup' // Object.is equality
+ ×  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement west 249ms
+   → expected undefined to be 'backup' // Object.is equality
+ ×  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement remote 227ms
+   → expected undefined to be 'backup' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL   chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement undefined
+ FAIL   chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement west
+ FAIL   chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement remote
+AssertionError: expected undefined to be 'backup' // Object.is equality
+
+Failure screenshots:
+  - ui/.vitest/attachments/failure-screenshots/config-form-collection-preserve.browser.test.ts/collection-entry-draft-preservation---keeps-local-drafts-but-clears-unmatched-external-replacement-undefined.png
+  - ui/.vitest/attachments/failure-screenshots/config-form-collection-preserve.browser.test.ts/collection-entry-draft-preservation---keeps-local-drafts-but-clears-unmatched-external-replacement-west.png
+  - ui/.vitest/attachments/failure-screenshots/config-form-collection-preserve.browser.test.ts/collection-entry-draft-preservation---keeps-local-drafts-but-clears-unmatched-external-replacement-remote.png
+
+- Expected:
+"backup"
+
++ Received:
+undefined
+
+ ❯ src/components/config-form-collection-preserve.browser.test.ts:52:11
+     50|         expect(
+     51|           container.querySelector<HTMLInputElement>("[data-collection-…
+     52|         ).toBe("backup");
+       |           ^
+     53|         expect(
+     54|           container.querySelector<HTMLInputElement>("[data-collection-…
+ ❯ node_modules/.vite/vitest/ef98362b8a6b0c8cd804b0d227aa1ffeaba89786/deps/plugins.DPQHVT0p-DhDCofh0.js?v=89fe5514:5242:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  04:14:25
+   Duration  3.90s (tests 48%, import 21%, setup 17%, worker 13%)
+
+[Vitest temporary namespace path redacted; see cleanup record.]
+[test] FAILED (exit 1)

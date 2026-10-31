@@ -1,0 +1,1 @@
+import {it,expect} from "vitest"; it("executes an actual Chromium DOM assertion",()=>{ const e=document.createElement("button");e.textContent="isolated probe";document.body.append(e);expect(e.textContent).toBe("isolated probe");e.remove();});

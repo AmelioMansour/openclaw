@@ -1,0 +1,36 @@
+{
+  "method": "Config import control; default subprocess vs supported override set to the same installed Chromium executable, never a fabricated path.",
+  "versionsNote": "Initial import-only matrix used the original worktree shared dependency environment. Separately, an actual held archive trace with pinned Vitest5.0.5/Vite8.3.5/Playwright1.64.1 stops at the identical synchronous chrome.exe --version probe; complete assertion matrix uses the latter matching toolchain.",
+  "observedBlockingCall": "spawnSync(chromiumExecutablePath, [\"--version\"], { stdio: \"ignore\" })",
+  "source": "ui/src/test-helpers/playwright-chromium.ts:66",
+  "runs": [
+    {
+      "revision": "base",
+      "mode": "default",
+      "code": 1,
+      "timedOut": true,
+      "durationMs": 30555
+    },
+    {
+      "revision": "base",
+      "mode": "explicit-same-binary",
+      "code": 0,
+      "timedOut": false,
+      "durationMs": 7899
+    },
+    {
+      "revision": "head",
+      "mode": "default",
+      "code": 1,
+      "timedOut": true,
+      "durationMs": 30492
+    },
+    {
+      "revision": "head",
+      "mode": "explicit-same-binary",
+      "code": 0,
+      "timedOut": false,
+      "durationMs": 7350
+    }
+  ]
+}

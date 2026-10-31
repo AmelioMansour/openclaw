@@ -25,3 +25,7 @@
 ## Explicit limitations / external gate
 
 This local refreshed comparison does **not** causally explain the historical +293-byte failure on the old head, and it is not a claim that newly triggered CI is green. Real-route proof used the default main agent; non-default coverage is in the passing browser tests. The UI-owner decision about catalog restriction/retirement and default-agent selection presentation remains unresolved and must not be treated as approved. No merge is requested by this evidence.
+
+## Exact-head review followthrough
+
+ClawSweeper reviewed 0b3147f745860331de37156be6143db57335c7f6 on October31,2026: findings0, shipped-route proof sufficient, exact-head greenCI accepted. Sole remaining merge blocker: UI-owner presentation decision, NOT approved. Review: https://github.com/openclaw/openclaw/pull/182678#issuecomment-6386227135

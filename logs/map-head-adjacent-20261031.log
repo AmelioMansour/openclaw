@@ -1,0 +1,102 @@
+node : (!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to
+become the default in a future major version of Vite:
+At line:1 char:1
++ node scripts/run-vitest.mjs run --config ui/vitest.config.ts --projec ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((!) Your V...ersion of Vite::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+  - JSON import "./control-ui-i18n-config.json" without import attributes
+(scripts/lib/control-ui-i18n-sync-plan.ts:2:41). Add `with { type: 'json' }`
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.5 [MAP_HEAD]/ui
+
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > applies safe whole-array composition candidates atomically 52ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > shows and clears optional JSON defaults without authoring the inherited value 36ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > shows optional array defaults and authors inherited items without dropping siblings 51ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > authors a nested inherited array item without dropping sibling defaults 59ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > conceals sensitive collection defaults: { type: 'object', ΓÇª(2) } 6ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > conceals sensitive collection defaults: { type: 'array', items: [Object], ΓÇª(1) } 6ms
+ Γ£ô  chromium  src/components/config-form-collection-defaults.browser.test.ts > config form collection defaults > keeps optional object children inherited until edited 13ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > renders object fields guarded by a required-property exclusion 101ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > preserves unquoted strings and decodes quoted strings in string-number arrays 73ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > keeps large and unique array minimums incrementally editable 63ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > restores JSON rows when a collection constraint rejects the edit 17ms
+ Γ£ô  chromium  src/components/config-form-rejection-integrity.browser.test.ts > config form rejection integrity > opens the array draft when a parent rejects the automatic entry 123ms
+ Γ£ô  chromium  src/components/config-form-rejection-integrity.browser.test.ts > config form rejection integrity > opens the map draft when a parent rejects the automatic entry 50ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > generates a custom key without colliding with declared fields 144ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected duplicate rename after restoring the valid key 41ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected reserved rename after restoring the valid key 24ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected schema rename after restoring the valid key 23ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > renders finite boolean unions and string-or-literal unions while keeping constrained unions in Raw mode 108ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > keeps annotations harmless and items-only schemas form-unsafe 5ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > normalizes primitive type arrays without accepting structured or composed type arrays 1ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > marks incompatible effective allOf child schemas as form-unsafe 1ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > preserves nullability inherited through allOf 1ms
+ Γ£ô  chromium  src/components/config-form-composition-integrity.browser.test.ts > config form composition integrity > keeps type-less allOf fields unsafe and closed empty tuples repairable 21ms
+stderr | src/components/config-form-integrity.browser.test.ts > config form integrity >
+applies schema constraints and derives bounded repeated defaults
+[UNCOMMITTED_INPUT_OVERWRITTEN] <input type="text">.value was changed by the user, but the change was never
+committed to the signal bound to `value`, and Solid is writing the bound value back over it: the user's input is lost.
+A compiled `value` binding re-applies the bound value whenever its effect runs ΓÇö here with the value unchanged,
+because another binding in the same template changed, a spread re-ran, or the source fired with an equal value ΓÇö and
+the signal is the source of truth. Write the signal on every edit (`onInput={e => setValue(e.currentTarget.value)}`, a
+draft signal you commit later), use `defaultValue` for an uncontrolled element, or write a rejected edit back
+explicitly (`e.currentTarget.value = next`).
+[UNCOMMITTED_INPUT_OVERWRITTEN] what it means and how to fix it:
+https://v2.solidjs.com/reference/solid-js/diagnostics/uncommitted-input-overwritten
+[UNCOMMITTED_INPUT_OVERWRITTEN] agent repair guide:
+node_modules/solid-js/skills/reactivity-diagnostics/SKILL.md#uncommitted_input_overwritten ΓÇö https://github.com/solid
+js/solid/blob/next/packages/solid/skills/reactivity-diagnostics/SKILL.md#uncommitted_input_overwritten
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > resets scalar and JSON drafts when the first equal primitive row is removed 28ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > adds null through nullable scalar collection drafts 17ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > propagates rejected edits through nested constrained arrays 28ms
+ Γ£ô  chromium  src/components/config-form-array-integrity.browser.test.ts > config form array integrity > resets a reused object row after array removal 17ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > round-trips the agent model Code Mode field without losing sibling settings 238ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > keeps plain-string record keys editable through nested maps 32ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > keeps null property-name constraints fail-closed 1ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > keeps wrong type property-name constraints fail-closed 1ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > keeps unknown constraint property-name constraints fail-closed 1ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > rejects pattern key edits even when an existing value is invalid 78ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > rejects enumeration key edits even when an existing value is invalid 19ms
+ Γ£ô  chromium  src/components/config-form-map-integrity.browser.test.ts > config form map integrity > keeps supported map children editable beside Raw-only fields 10ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected redacted rename after restoring the valid key 22ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected empty rename after restoring the valid key 19ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > explains a rejected parent rename after restoring the valid key 22ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own constructor entries after add without changing prototypes 34ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own constructor entries after rename without changing prototypes 15ms
+ Γ£ô  chromium  src/components/config-form-integrity.browser.test.ts > config form integrity > applies schema constraints and derives bounded repeated defaults 342ms
+ Γ£ô  chromium  src/components/config-form-integrity.browser.test.ts > config form integrity > commits typed map entry primary only after the local draft is valid 28ms
+ Γ£ô  chromium  src/components/config-form-integrity.browser.test.ts > config form integrity > preserves unaffected scalar drafts and resets changed repeated rows 43ms
+ Γ£ô  chromium  src/components/config-form-integrity.browser.test.ts > config form integrity > clears scalar validity when sensitive presentation changes 11ms
+ Γ£ô  chromium  src/components/config-form-integrity.browser.test.ts > config form integrity > retains invalid JSON drafts with an inline accessible error 19ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own prototype entries after add without changing prototypes 20ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own prototype entries after rename without changing prototypes 13ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own __proto__ entries after add without changing prototypes 18ms
+ Γ£ô  chromium  src/components/config-form-map-keys.browser.test.ts > config form map key ownership > edits own __proto__ entries after rename without changing prototypes 11ms
+ Γ£ô  chromium  src/components/config-form-rejection-integrity.browser.test.ts > config form rejection integrity > preserves an optional object draft until valid, with commit accepted=true 77ms
+ Γ£ô  chromium  src/components/config-form-rejection-integrity.browser.test.ts > config form rejection integrity > preserves an optional object draft until valid, with commit accepted=false 21ms
+ Γ£ô  chromium  src/components/config-form-rejection-integrity.browser.test.ts > config form rejection integrity > constructs an optional large-minimum array without leaking partial values 454ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > preserves the surviving invalid draft after scalar removal through the config draft owner 843ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > preserves the surviving invalid draft after object removal through the config draft owner 289ms
+ Γ£ô  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement undefined 1187ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > preserves the surviving invalid draft after unrelated edit through the config draft owner 189ms
+ Γ£ô  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement west 186ms
+ Γ£ô  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement remote 148ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > keeps a nested array draft when an earlier row is removed 220ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > keeps a nested map draft when an earlier row is removed 359ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config array row drafts > keeps a nested object draft when an earlier row is removed 246ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config collection removal focus > moves keyboard focus to the next row, the previous row, then Add after list removals 205ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config collection removal focus > keeps keyboard focus on a surviving entry, then Add entry after map removals 191ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config collection removal focus > keeps focus on the outer list when a removed row contains a nested list 164ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config collection removal focus > keeps focus on the list Remove control when its owner rejects the removal 127ms
+ Γ£ô  chromium  src/components/config-form-array-drafts.browser.test.ts > config collection removal focus > keeps focus on the map Remove control when its owner rejects the removal 132ms
+
+ Test Files  9 passed (9)
+      Tests  66 passed (66)
+   Start at  04:26:23
+   Duration  13.97s (import 48%, worker 23%, tests 16%, setup 13%)
+
+[Vitest temporary namespace path redacted; see cleanup record.]
+unverified on this non-group launch. Stop the remaining writers before removing this exact directory.

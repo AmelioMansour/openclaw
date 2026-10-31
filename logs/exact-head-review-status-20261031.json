@@ -1,0 +1,41 @@
+[
+  {
+    "number": 182678,
+    "headRefOid": "0b3147f745860331de37156be6143db57335c7f6",
+    "state": "OPEN",
+    "url": "https://github.com/openclaw/openclaw/pull/182678",
+    "reviews": [
+      {
+        "url": "https://github.com/openclaw/openclaw/pull/182678#issuecomment-6386227135",
+        "updatedAt": "2026-10-31T08:07:11Z",
+        "verdict": "<!-- clawsweeper-verdict:needs-human item=182678 sha=0b3147f745860331de37156be6143db57335c7f6 confidence=high updated_at=2026-10-31T08:01:36Z reviewed_at=2026-10-31T08:06:05.518Z lease_owner=github-run-41182813705-1 lease_comment_id=6540858501 source_revision=9c38e1519169bf3fc79a594a8de0a50342034c5c507ce42b2cd0fe298b926e64 hold=maintainer_decision findings=0 -->"
+      }
+    ]
+  },
+  {
+    "number": 182085,
+    "headRefOid": "32e6b9e0621e700aba2935aa474b07e6c874535b",
+    "state": "OPEN",
+    "url": "https://github.com/openclaw/openclaw/pull/182085",
+    "reviews": [
+      {
+        "url": "https://github.com/openclaw/openclaw/pull/182085#issuecomment-6378559101",
+        "updatedAt": "2026-10-31T08:06:14Z",
+        "verdict": "<!-- clawsweeper-verdict:needs-human item=182085 sha=32e6b9e0621e700aba2935aa474b07e6c874535b confidence=high updated_at=2026-10-31T08:01:16Z reviewed_at=2026-10-31T08:05:07.379Z lease_owner=github-run-41182814244-1 lease_comment_id=6540859047 source_revision=bf5b8f82cbf2cab143472490fbe0d3047535d37014859fca09eff9c0c6971759 hold=proof findings=0 -->"
+      }
+    ]
+  },
+  {
+    "number": 182063,
+    "headRefOid": "f663fb18bd149f1825570c934f747c9d80b12587",
+    "state": "OPEN",
+    "url": "https://github.com/openclaw/openclaw/pull/182063",
+    "reviews": [
+      {
+        "url": "https://github.com/openclaw/openclaw/pull/182063#issuecomment-6378049992",
+        "updatedAt": "2026-10-27T13:21:50Z",
+        "verdict": "<!-- clawsweeper-verdict:needs-human item=182063 sha=f663fb18bd149f1825570c934f747c9d80b12587 confidence=high updated_at=2026-10-24T01:11:39Z reviewed_at=2026-10-24T01:15:43.300Z lease_owner=github-run-40048570440-1 lease_comment_id=6377984894 source_revision=b9c40f4dda83fe54de262bb9c8023f4a4081462007353923f3ba39fcaf5ccc10 hold=proof findings=0 -->"
+      }
+    ]
+  }
+]

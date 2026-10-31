@@ -1,0 +1,16 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - JSON import "./control-ui-i18n-config.json" without import attributes (scripts/lib/control-ui-i18n-sync-plan.ts:2:41). Add `with { type: 'json' }`
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.5 [MAP_HEAD]/ui
+
+ ✓  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement undefined 370ms
+ ✓  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement west 111ms
+ ✓  chromium  src/components/config-form-collection-preserve.browser.test.ts > collection entry draft preservation > keeps local drafts but clears unmatched external replacement remote 120ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  04:14:35
+   Duration  2.60s (tests 40%, setup 28%, import 17%, worker 15%)
+
+[Vitest temporary namespace path redacted; see cleanup record.]

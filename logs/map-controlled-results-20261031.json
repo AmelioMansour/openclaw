@@ -1,0 +1,114 @@
+{
+  "base": "b01ec056ade05bad61475ba7af3305cabb9740af",
+  "head": "e1382fde346f345695d70ff0eff6199b3b91d88f",
+  "runs": [
+    {
+      "kind": "minimal",
+      "revision": "base",
+      "file": "ui/src/test-helpers/diagnostic-startup-20261031.browser.test.ts",
+      "args": [
+        "scripts/run-vitest.mjs",
+        "run",
+        "--config",
+        "ui/vitest.config.ts",
+        "--project",
+        "chromium",
+        "ui/src/test-helpers/diagnostic-startup-20261031.browser.test.ts"
+      ],
+      "code": 0,
+      "timedOut": false,
+      "durationMs": 13721,
+      "versions": {
+        "vitest": "5.0.5",
+        "vite": "8.3.5",
+        "playwright": "1.64.1"
+      },
+      "environment": {
+        "runtime": "node",
+        "samePinnedChromium": true,
+        "gitOverride": false
+      }
+    },
+    {
+      "kind": "minimal",
+      "revision": "head",
+      "file": "ui/src/test-helpers/diagnostic-startup-20261031.browser.test.ts",
+      "args": [
+        "scripts/run-vitest.mjs",
+        "run",
+        "--config",
+        "ui/vitest.config.ts",
+        "--project",
+        "chromium",
+        "ui/src/test-helpers/diagnostic-startup-20261031.browser.test.ts"
+      ],
+      "code": 0,
+      "timedOut": false,
+      "durationMs": 8418,
+      "versions": {
+        "vitest": "5.0.5",
+        "vite": "8.3.5",
+        "playwright": "1.64.1"
+      },
+      "environment": {
+        "runtime": "node",
+        "samePinnedChromium": true,
+        "gitOverride": false
+      }
+    },
+    {
+      "kind": "regression",
+      "revision": "base",
+      "file": "ui/src/components/config-form-collection-preserve.browser.test.ts",
+      "args": [
+        "scripts/run-vitest.mjs",
+        "run",
+        "--config",
+        "ui/vitest.config.ts",
+        "--project",
+        "chromium",
+        "ui/src/components/config-form-collection-preserve.browser.test.ts"
+      ],
+      "code": 1,
+      "timedOut": false,
+      "durationMs": 16197,
+      "versions": {
+        "vitest": "5.0.5",
+        "vite": "8.3.5",
+        "playwright": "1.64.1"
+      },
+      "environment": {
+        "runtime": "node",
+        "samePinnedChromium": true,
+        "gitOverride": false
+      }
+    },
+    {
+      "kind": "regression",
+      "revision": "head",
+      "file": "ui/src/components/config-form-collection-preserve.browser.test.ts",
+      "args": [
+        "scripts/run-vitest.mjs",
+        "run",
+        "--config",
+        "ui/vitest.config.ts",
+        "--project",
+        "chromium",
+        "ui/src/components/config-form-collection-preserve.browser.test.ts"
+      ],
+      "code": 0,
+      "timedOut": false,
+      "durationMs": 9034,
+      "versions": {
+        "vitest": "5.0.5",
+        "vite": "8.3.5",
+        "playwright": "1.64.1"
+      },
+      "environment": {
+        "runtime": "node",
+        "samePinnedChromium": true,
+        "gitOverride": false
+      }
+    }
+  ]
+}

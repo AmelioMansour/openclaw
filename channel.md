@@ -19,3 +19,9 @@
 - Independent read-only diff reviews found no confirmed introduced correctness findings.
 
 No claim is made that all repository tests or newly triggered CI have completed. JSON-invalid and additional rejection-path coverage remain useful optional extensions; only the concrete cases above were exercised through the shipped route.
+
+## Exact-head review and bounded followthrough
+
+ClawSweeper reviewed32e6b9e0621e700aba2935aa474b07e6c874535b on October31,2026: findings0, exact-headCI green, but explicit enabledSave proof remains required. Review: https://github.com/openclaw/openclaw/pull/182085#issuecomment-6378559101
+
+Two bounded, native-interaction attempts did not satisfy the prerequisites and are NOT passing evidence. The separated nativeEnter diagnostic confirmed Name/scalar/Save in the real novalidate form and viewport, but its submission snapshot took1505ms, beyond the unchanged800ms autosave debounce. The numeric scalar read1(valid), not requested0; one config.set was already sent. The runner stopped before the corrected submission. This does not isolate invalid explicitSave and establishes no introduced product defect. No claim that the patch disables normal autosave. Fresh isolated fixtures exited cleanly and their listener absence was verified. Original screenshot limitations above remain unchanged. No corrective source change or new merge/rereview request is justified by these unsuccessful proof attempts.

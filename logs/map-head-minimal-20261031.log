@@ -1,0 +1,14 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - JSON import "./control-ui-i18n-config.json" without import attributes (scripts/lib/control-ui-i18n-sync-plan.ts:2:41). Add `with { type: 'json' }`
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
+
+ RUN  v5.0.5 [MAP_HEAD]/ui
+
+ ✓  chromium  src/test-helpers/diagnostic-startup-20261031.browser.test.ts > executes an actual Chromium DOM assertion 3ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  04:14:12
+   Duration  1.20s (worker 80%, setup 17%, import 2%, tests 2%)
+
+[Vitest temporary namespace path redacted; see cleanup record.]
