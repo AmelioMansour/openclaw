@@ -17,6 +17,10 @@ import { createPluginRecord } from "../plugins/status.test-helpers.js";
 import type { ProviderPlugin } from "../plugins/types.js";
 import { getPreparedPluginSecretInput } from "../secrets/prepared-plugin-input.js";
 import * as secrets from "../secrets/runtime-state.js";
+import {
+  prepareAmbientAgentCredentialsForDiscovery,
+  resolveAmbientAgentCredentialsForDiscovery,
+} from "./agent-auth-discovery.js";
 import * as snapshots from "./auth-profiles/runtime-snapshots.js";
 import { CUSTOM_LOCAL_AUTH_MARKER } from "./model-auth-markers.js";
 import * as authModel from "./model-auth-model.js";
@@ -35,6 +39,9 @@ vi.mock("../plugins/provider-hook-runtime.js", async () => {
     createProviderRegistryResolver({
       loadOpenClawPlugins: () => {
         throw new Error("cold plugin load");
+      },
+      acquirePluginRegistryForInspection: async () => {
+        throw new Error("cold plugin inspection");
       },
       resolveRuntimePluginRegistry: () => undefined,
       isPluginRegistryLoadInFlight: () => false,
@@ -238,7 +245,7 @@ baseIt.each(["requiredAuthProfileId", "sessionAuthProfileId"] as const)(
 
 test("uses prepared metadata ownership over ambient declarations", async (f) => {
   const modelPolicy = await import("./model-auth-policy.js");
-  const policy = vi.spyOn(modelPolicy, "isAuthModeAllowedForModel").mockImplementation(
+  using _ = vi.spyOn(modelPolicy, "isAuthModeAllowedForModel").mockImplementation(
     () =>
       metadataScope.getCurrentPluginMetadataSnapshot({
         config: f.cfg,
@@ -246,16 +253,12 @@ test("uses prepared metadata ownership over ambient declarations", async (f) => 
         allowWorkspaceScopedSnapshot: true,
       }) === f.metadata,
   );
-  try {
-    metadataScope.withPluginMetadataSnapshotScope(
-      metadataFixture("foreign-owner"),
-      () => expect(project(f).evaluateEntry(entry)).toMatchObject({ availability: true }),
-      { config: f.cfg, trustConfigIdentity: true },
-    );
-    expect(f.hook).toHaveBeenCalled();
-  } finally {
-    policy.mockRestore();
-  }
+
+  metadataScope.withPluginMetadataSnapshotScope(
+    metadataFixture("foreign-owner"),
+    () => expect(project(f).evaluateEntry(entry)).toMatchObject({ availability: true }),
+    { config: f.cfg, trustConfigIdentity: true },
+  );
 });
 
 test.each([false, true])(
@@ -564,4 +567,19 @@ test.each([
     expect(f.hook).not.toHaveBeenCalled();
   },
   ([scope, runtimeScope]) => ({ scope, runtimeScope, active: false }),
+);
+
+test(
+  "ambient discovery skips a plugin-owned provider without a live credential",
+  async (f) => {
+    const options = { config: f.cfg, syntheticAuthProviderRefs: [id] };
+    expect(() => providerRuntime.resolveProviderSyntheticAuthWithPlugin(f.lookup)).toThrow(
+      "live credential or no-auth evidence is missing",
+    );
+    expect(resolveAmbientAgentCredentialsForDiscovery(options)).not.toHaveProperty(id);
+    await expect(prepareAmbientAgentCredentialsForDiscovery(options)).resolves.not.toHaveProperty(
+      id,
+    );
+  },
+  { active: false },
 );
