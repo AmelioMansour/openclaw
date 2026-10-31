@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-31",
+  "map": {
+    "head": "e1382fde346f345695d70ff0eff6199b3b91d88f",
+    "findings": 0,
+    "proof": "sufficient (screenshot and runtime trace)",
+    "hold": "not_opted_in",
+    "state": "ready",
+    "reviewedAt": "2026-10-31T09:13:32.464Z",
+    "url": "https://github.com/openclaw/openclaw/pull/182063#issuecomment-6378049992",
+    "remaining": "Maintainer review only; Before merge: None."
+  },
+  "channel": {
+    "head": "32e6b9e0621e700aba2935aa474b07e6c874535b",
+    "findings": 0,
+    "proof": "sufficient (logs)",
+    "hold": "not_opted_in",
+    "state": "ready",
+    "reviewedAt": "2026-10-31T09:16:05.763Z",
+    "url": "https://github.com/openclaw/openclaw/pull/182085#issuecomment-6378559101",
+    "remaining": "Maintainer review only; Before merge: None."
+  },
+  "model": {
+    "head": "0b3147f745860331de37156be6143db57335c7f6",
+    "findings": 0,
+    "proof": "sufficient",
+    "hold": "maintainer_decision",
+    "url": "https://github.com/openclaw/openclaw/pull/182678#issuecomment-6386227135"
+  },
+  "ci": {
+    "map": {
+      "id": 41185485801,
+      "headSha": "e1382fde346f345695d70ff0eff6199b3b91d88f",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/openclaw/openclaw/actions/runs/41185485801"
+    },
+    "channel": {
+      "headSha": "32e6b9e0621e700aba2935aa474b07e6c874535b",
+      "conclusion": "success",
+      "url": "https://github.com/openclaw/openclaw/actions/runs/41182128946"
+    },
+    "model": {
+      "headSha": "0b3147f745860331de37156be6143db57335c7f6",
+      "conclusion": "success",
+      "url": "https://github.com/openclaw/openclaw/actions/runs/41182122990"
+    }
+  },
+  "scope": "Review acceptance is not maintainer approval or merge. No auto-merge opt-in or merge requested/performed."
+}
